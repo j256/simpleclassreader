@@ -22,6 +22,34 @@ public class FieldInfo {
 		this.attributes = attributes;
 	}
 
+	/**
+	 * Read in an attribute.
+	 */
+	public static FieldInfo read(ClassReader reader, DataInputStream dis) throws IOException {
+		// u2 access_flags;
+		// u2 name_index;
+		// u2 descriptor_index;
+		// u2 attributes_count;
+		// attribute_info attributes[attributes_count];
+
+		int accessFlags = dis.readUnsignedShort();
+		int index = dis.readUnsignedShort();
+		String name = reader.findName(index, ClassReaderError.INVALID_FIELD_NAME_INDEX);
+		index = dis.readUnsignedShort();
+		String typeStr = reader.findName(index, ClassReaderError.INVALID_FIELD_DESCRIPTOR_INDEX);
+		DataDescriptor dataType = null;
+		if (typeStr != null) {
+			dataType = DataDescriptor.fromString(typeStr);
+		}
+		int attributeCount = dis.readUnsignedShort();
+		AttributeInfo[] attributes = new AttributeInfo[attributeCount];
+		for (int i = 0; i < attributeCount; i++) {
+			attributes[i] = AttributeInfo.read(reader, dis);
+		}
+
+		return new FieldInfo(accessFlags, name, dataType, attributes);
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -73,32 +101,9 @@ public class FieldInfo {
 		return attributes;
 	}
 
-	/**
-	 * Read in an attribute.
-	 */
-	public static FieldInfo read(ClassReader reader, DataInputStream dis) throws IOException {
-		// u2 access_flags;
-		// u2 name_index;
-		// u2 descriptor_index;
-		// u2 attributes_count;
-		// attribute_info attributes[attributes_count];
-
-		int accessFlags = dis.readUnsignedShort();
-		int index = dis.readUnsignedShort();
-		String name = reader.findName(index, ClassReaderError.INVALID_FIELD_NAME_INDEX);
-		index = dis.readUnsignedShort();
-		String typeStr = reader.findName(index, ClassReaderError.INVALID_FIELD_DESCRIPTOR_INDEX);
-		DataDescriptor dataType = null;
-		if (typeStr != null) {
-			dataType = DataDescriptor.fromString(typeStr);
-		}
-		int attributeCount = dis.readUnsignedShort();
-		AttributeInfo[] attributes = new AttributeInfo[attributeCount];
-		for (int i = 0; i < attributeCount; i++) {
-			attributes[i] = AttributeInfo.read(reader, dis);
-		}
-
-		return new FieldInfo(accessFlags, name, dataType, attributes);
+	@Override
+	public String toString() {
+		return "field " + name;
 	}
 
 	/**

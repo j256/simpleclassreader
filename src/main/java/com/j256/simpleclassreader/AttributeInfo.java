@@ -22,14 +22,6 @@ public class AttributeInfo {
 		this.info = info;
 	}
 
-	public String getName() {
-		return name;
-	}
-
-	public byte[] getInfo() {
-		return info;
-	}
-
 	/**
 	 * Read in an attribute.
 	 */
@@ -39,5 +31,18 @@ public class AttributeInfo {
 		int length = dis.readInt();
 		dis.skip(length);
 		return new AttributeInfo(name, null);
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public byte[] getInfo() {
+		return info;
+	}
+
+	@Override
+	public String toString() {
+		return "attribute " + name;
 	}
 }

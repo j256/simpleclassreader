@@ -10,6 +10,7 @@ import java.io.IOException;
  */
 public class MethodInfo {
 
+	private static final String CONSTRUCTOR_METHOD_NAME = "<init>";
 	private final int accessFlags;
 	private final String name;
 	private final MethodDescriptor methodDescriptor;
@@ -20,6 +21,34 @@ public class MethodInfo {
 		this.name = name;
 		this.methodDescriptor = methodDescriptor;
 		this.attributes = attributes;
+	}
+
+	/**
+	 * Read in a field information entry.
+	 */
+	public static MethodInfo read(ClassReader reader, DataInputStream dis) throws IOException {
+		// u2 access_flags;
+		// u2 name_index;
+		// u2 descriptor_index;
+		// u2 attributes_count;
+		// attribute_info attributes[attributes_count];
+
+		int accessFlags = dis.readUnsignedShort();
+		int index = dis.readUnsignedShort();
+		String name = reader.findName(index, ClassReaderError.INVALID_METHOD_NAME_INDEX);
+		index = dis.readUnsignedShort();
+		String methodDescriptorStr = reader.findName(index, ClassReaderError.INVALID_METHOD_DESCRIPTOR_INDEX);
+		MethodDescriptor methodDescriptor = null;
+		if (methodDescriptorStr != null) {
+			methodDescriptor = MethodDescriptor.fromString(methodDescriptorStr);
+		}
+		int attributeCount = dis.readUnsignedShort();
+		AttributeInfo[] attributes = new AttributeInfo[attributeCount];
+		for (int i = 0; i < attributeCount; i++) {
+			attributes[i] = AttributeInfo.read(reader, dis);
+		}
+
+		return new MethodInfo(accessFlags, name, methodDescriptor, attributes);
 	}
 
 	public int getAccessFlags() {
@@ -57,7 +86,7 @@ public class MethodInfo {
 		return MethodAccessInfo.BRIDGE.isEnabled(accessFlags);
 	}
 
-	public boolean isVerargs() {
+	public boolean isVarargs() {
 		return MethodAccessInfo.VARARGS.isEnabled(accessFlags);
 	}
 
@@ -84,6 +113,10 @@ public class MethodInfo {
 		return name;
 	}
 
+	public boolean isConstructor() {
+		return CONSTRUCTOR_METHOD_NAME.equals(name);
+	}
+
 	public MethodDescriptor getMethodDescriptor() {
 		return methodDescriptor;
 	}
@@ -92,32 +125,25 @@ public class MethodInfo {
 		return attributes;
 	}
 
-	/**
-	 * Read in a field information entry.
-	 */
-	public static MethodInfo read(ClassReader reader, DataInputStream dis) throws IOException {
-		// u2 access_flags;
-		// u2 name_index;
-		// u2 descriptor_index;
-		// u2 attributes_count;
-		// attribute_info attributes[attributes_count];
-
-		int accessFlags = dis.readUnsignedShort();
-		int index = dis.readUnsignedShort();
-		String name = reader.findName(index, ClassReaderError.INVALID_METHOD_NAME_INDEX);
-		index = dis.readUnsignedShort();
-		String methodDescriptorStr = reader.findName(index, ClassReaderError.INVALID_METHOD_DESCRIPTOR_INDEX);
-		MethodDescriptor methodDescriptor = null;
-		if (methodDescriptorStr != null) {
-			methodDescriptor = MethodDescriptor.fromString(methodDescriptorStr);
+	public DataDescriptor[] getParameterDataDescriptors() {
+		if (methodDescriptor == null) {
+			return null;
+		} else {
+			return methodDescriptor.getParameterDataDescriptors();
 		}
-		int attributeCount = dis.readUnsignedShort();
-		AttributeInfo[] attributes = new AttributeInfo[attributeCount];
-		for (int i = 0; i < attributeCount; i++) {
-			attributes[i] = AttributeInfo.read(reader, dis);
-		}
+	}
 
-		return new MethodInfo(accessFlags, name, methodDescriptor, attributes);
+	public DataDescriptor getReturnDescriptor() {
+		if (methodDescriptor == null) {
+			return null;
+		} else {
+			return methodDescriptor.getReturnDescriptor();
+		}
+	}
+
+	@Override
+	public String toString() {
+		return "method " + name;
 	}
 
 	/**

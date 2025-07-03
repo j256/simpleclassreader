@@ -12,10 +12,12 @@ import com.j256.simpleclassreader.DataDescriptor.MutableIndex;
  */
 public class MethodDescriptor {
 
+	private final String str;
 	private final DataDescriptor[] parameterDataDescriptors;
 	private final DataDescriptor returnDescriptor;
 
-	public MethodDescriptor(DataDescriptor[] parameterDataDescriptors, DataDescriptor returnDescriptor) {
+	public MethodDescriptor(String str, DataDescriptor[] parameterDataDescriptors, DataDescriptor returnDescriptor) {
+		this.str = str;
 		this.parameterDataDescriptors = parameterDataDescriptors;
 		this.returnDescriptor = returnDescriptor;
 	}
@@ -26,6 +28,11 @@ public class MethodDescriptor {
 
 	public DataDescriptor getReturnDescriptor() {
 		return returnDescriptor;
+	}
+
+	@Override
+	public String toString() {
+		return str;
 	}
 
 	/**
@@ -51,8 +58,7 @@ public class MethodDescriptor {
 		mutableIndex.increment(1);
 
 		DataDescriptor returnDescriptor = DataDescriptor.fromString(str, mutableIndex);
-		return new MethodDescriptor(
-				parameterDataDescriptors.toArray(new DataDescriptor[parameterDataDescriptors.size()]),
-				returnDescriptor);
+		DataDescriptor[] params = parameterDataDescriptors.toArray(new DataDescriptor[parameterDataDescriptors.size()]);
+		return new MethodDescriptor(str, params, returnDescriptor);
 	}
 }

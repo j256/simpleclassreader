@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Simple class that reads the first couple of bytes from a class to get the name and the JDK version.
  * 
- * Based on careful reading of: https://docs.oracle.com/javase/specs/jvms/se11/html/jvms-4.html#jvms-4.4.2
+ * Based on: https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-4.html
  */
 public class ClassReader {
 
@@ -30,6 +30,7 @@ public class ClassReader {
 	private String superClassName;
 	private String[] interfaces;
 	private FieldInfo[] fields;
+	private MethodInfo[] constructors;
 	private MethodInfo[] methods;
 	private AttributeInfo[] attributes;
 	private boolean valid;
@@ -43,6 +44,9 @@ public class ClassReader {
 		this(new ByteArrayInputStream(classBytes, offset, length));
 	}
 
+	/**
+	 * Read in a class using the input-stream which will _not_ be closed.
+	 */
 	public ClassReader(InputStream inputStream) {
 		try (DataInputStream dis = new DataInputStream(inputStream);) {
 			readClass(dis);
@@ -117,6 +121,10 @@ public class ClassReader {
 		return className;
 	}
 
+	public String getSuperClassName() {
+		return superClassName;
+	}
+
 	/**
 	 * Return the interfaces that the class extends or a blank array if none.
 	 */
@@ -126,6 +134,10 @@ public class ClassReader {
 
 	public FieldInfo[] getFields() {
 		return fields;
+	}
+
+	public MethodInfo[] getConstructors() {
+		return constructors;
 	}
 
 	public MethodInfo[] getMethods() {
@@ -147,11 +159,6 @@ public class ClassReader {
 	 * Find a UTF8 name in the cp-info blocks
 	 */
 	String findName(int nameIndex, ClassReaderError error) {
-		if (nameIndex >= indexes.length) {
-			errors.add(error);
-			return null;
-		}
-		nameIndex = indexes[nameIndex];
 		if (nameIndex >= names.length) {
 			errors.add(error);
 			return null;
@@ -168,7 +175,13 @@ public class ClassReader {
 			errors.add(ClassReaderError.INVALID_CLASS_NAME_INDEX);
 			return null;
 		}
-		return findName(indexes[nameIndex], ClassReaderError.INVALID_CLASS_NAME_INDEX);
+		// the class name points to a class-type which points to a UTF8
+		if (nameIndex >= indexes.length) {
+			errors.add(ClassReaderError.INVALID_CLASS_NAME_INDEX);
+			return null;
+		}
+		nameIndex = indexes[nameIndex];
+		return findName(nameIndex, ClassReaderError.INVALID_CLASS_NAME_INDEX);
 	}
 
 	/**
@@ -195,16 +208,29 @@ public class ClassReader {
 		if (className == null) {
 			return;
 		}
+		className = className.replace('/', '.');
 		// super class-name
 		index = dis.readUnsignedShort();
 		superClassName = findClassName(index);
 		if (superClassName == null) {
 			return;
 		}
+		superClassName = superClassName.replace('/', '.');
 
 		interfaces = readInterfaces(dis);
 		fields = readFields(dis);
-		methods = readMethods(dis);
+		MethodInfo[] allMethods = readMethods(dis);
+		List<MethodInfo> constructorList = new ArrayList<>();
+		List<MethodInfo> methodList = new ArrayList<>();
+		for (MethodInfo method : allMethods) {
+			if (method.isConstructor()) {
+				constructorList.add(method);
+			} else {
+				methodList.add(method);
+			}
+		}
+		constructors = constructorList.toArray(new MethodInfo[constructorList.size()]);
+		methods = methodList.toArray(new MethodInfo[methodList.size()]);
 		attributes = readAttributes(dis);
 
 		valid = true;
@@ -223,7 +249,7 @@ public class ClassReader {
 	private FieldInfo[] readFields(DataInputStream dis) throws IOException {
 		int num = dis.readUnsignedShort();
 		FieldInfo[] fields = new FieldInfo[num];
-		for (int i = 0; i < names.length; i++) {
+		for (int i = 0; i < fields.length; i++) {
 			fields[i] = FieldInfo.read(this, dis);
 		}
 		return fields;
@@ -232,16 +258,16 @@ public class ClassReader {
 	private MethodInfo[] readMethods(DataInputStream dis) throws IOException {
 		int num = dis.readUnsignedShort();
 		MethodInfo[] methods = new MethodInfo[num];
-		for (int i = 0; i < names.length; i++) {
+		for (int i = 0; i < methods.length; i++) {
 			methods[i] = MethodInfo.read(this, dis);
 		}
-		return null;
+		return methods;
 	}
 
 	private AttributeInfo[] readAttributes(DataInputStream dis) throws IOException {
 		int num = dis.readUnsignedShort();
 		AttributeInfo[] attributes = new AttributeInfo[num];
-		for (int i = 0; i < names.length; i++) {
+		for (int i = 0; i < attributes.length; i++) {
 			attributes[i] = AttributeInfo.read(this, dis);
 		}
 		return attributes;

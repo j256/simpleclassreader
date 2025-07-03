@@ -9,12 +9,12 @@ public class DataDescriptor {
 
 	private final int arrayDepth;
 	private final BaseType baseType;
-	private final String className;
+	private final String referenceClassName;
 
-	public DataDescriptor(int arrayDepth, BaseType baseType, String className) {
+	public DataDescriptor(int arrayDepth, BaseType baseType, String referenceClassName) {
 		this.arrayDepth = arrayDepth;
 		this.baseType = baseType;
-		this.className = className;
+		this.referenceClassName = referenceClassName;
 	}
 
 	/**
@@ -50,6 +50,7 @@ public class DataDescriptor {
 		if (baseType == BaseType.REFERENCE) {
 			int end = str.indexOf(';', index);
 			className = str.substring(index, end);
+			className = className.replace('/', '.');
 			index = end + 1;
 		}
 
@@ -102,10 +103,31 @@ public class DataDescriptor {
 	}
 
 	/**
+	 * Return the primitive data-class name or the name of reference class if type is a REFERENCE.
+	 */
+	public String getDataClassName() {
+		if (baseType == BaseType.REFERENCE) {
+			return referenceClassName;
+		} else {
+			return baseType.dataClass.getName();
+		}
+	}
+
+	/**
 	 * Classname if the base-type is BaseType.REFERENCE.
 	 */
-	public String getClassName() {
-		return className;
+	public String getReferenceClassName() {
+		return referenceClassName;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		if (arrayDepth > 0) {
+			sb.append("array of ");
+		}
+		sb.append(getDataClassName());
+		return sb.toString();
 	}
 
 	/**
