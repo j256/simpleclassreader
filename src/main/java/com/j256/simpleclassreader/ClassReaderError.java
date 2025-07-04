@@ -7,9 +7,7 @@ package com.j256.simpleclassreader;
  */
 public enum ClassReaderError {
 	MAGIC_INVALID("magic numbner at the start of the class doesn't match 0xCAFEBABE, maybe not a class"),
-	PREMATURE_EOF("tried to read past the end of the file, possible truncation"),
-	INPUT_PROBLEMS("generial input problems reading in the class"),
-	UNKNOWN_CP_INFO("unknown cp-info class struction type"),
+	UNKNOWN_CONSTANT_POOL_INFO("unknown cp-info class struction type"),
 	INVALID_CLASS_NAME_INDEX("class name index does not point to valid location"),
 	INVALID_FIELD_NAME_INDEX("field name index does not point to valid location"),
 	INVALID_FIELD_DESCRIPTOR_INDEX("field descriptor index does not point to valid location"),

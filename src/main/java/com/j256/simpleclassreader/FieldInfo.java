@@ -2,6 +2,7 @@ package com.j256.simpleclassreader;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Information about a field that the class has.
@@ -25,7 +26,9 @@ public class FieldInfo {
 	/**
 	 * Read in an attribute.
 	 */
-	public static FieldInfo read(ClassReader reader, DataInputStream dis) throws IOException {
+	public static FieldInfo read(DataInputStream dis, ConstantPool constantPool, List<ClassReaderError> errors)
+			throws IOException {
+
 		// u2 access_flags;
 		// u2 name_index;
 		// u2 descriptor_index;
@@ -34,9 +37,17 @@ public class FieldInfo {
 
 		int accessFlags = dis.readUnsignedShort();
 		int index = dis.readUnsignedShort();
-		String name = reader.findName(index, ClassReaderError.INVALID_FIELD_NAME_INDEX);
+		String name = constantPool.findName(index);
+		if (name == null) {
+			errors.add(ClassReaderError.INVALID_FIELD_NAME_INDEX);
+			return null;
+		}
 		index = dis.readUnsignedShort();
-		String typeStr = reader.findName(index, ClassReaderError.INVALID_FIELD_DESCRIPTOR_INDEX);
+		String typeStr = constantPool.findName(index);
+		if (typeStr == null) {
+			errors.add(ClassReaderError.INVALID_FIELD_DESCRIPTOR_INDEX);
+			return null;
+		}
 		DataDescriptor dataType = null;
 		if (typeStr != null) {
 			dataType = DataDescriptor.fromString(typeStr);
@@ -44,59 +55,99 @@ public class FieldInfo {
 		int attributeCount = dis.readUnsignedShort();
 		AttributeInfo[] attributes = new AttributeInfo[attributeCount];
 		for (int i = 0; i < attributeCount; i++) {
-			attributes[i] = AttributeInfo.read(reader, dis);
+			attributes[i] = AttributeInfo.read(dis, constantPool, errors);
 		}
 
 		return new FieldInfo(accessFlags, name, dataType, attributes);
 	}
 
+	/**
+	 * Return name of the field.
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * Returns access-flags value.
+	 */
+	public int getAccessFlags() {
+		return accessFlags;
+	}
+
+	/**
+	 * Returns true if declared public; may be accessed from outside its package
+	 */
 	public boolean isPublic() {
 		return FieldAccessInfo.PUBLIC.isEnabled(accessFlags);
 	}
 
+	/**
+	 * Returns true if declared private; accessible only within defining class and other classes belonging to same nest
+	 */
 	public boolean isPrivate() {
 		return FieldAccessInfo.PRIVATE.isEnabled(accessFlags);
 	}
 
+	/**
+	 * Returns true if declared protected; may be accessed within subclasses.
+	 */
 	public boolean isProtected() {
 		return FieldAccessInfo.PROTECTED.isEnabled(accessFlags);
 	}
 
+	/**
+	 * Returns true if declared static.
+	 */
 	public boolean isStatic() {
 		return FieldAccessInfo.STATIC.isEnabled(accessFlags);
 	}
 
+	/**
+	 * Returns true if declared final; never directly assigned to after object construction (JLS §17.5).
+	 */
 	public boolean isFinal() {
 		return FieldAccessInfo.FINAL.isEnabled(accessFlags);
 	}
 
+	/**
+	 * Returns true if declared volatile; cannot be cached.
+	 */
 	public boolean isVolatile() {
 		return FieldAccessInfo.VOLATILE.isEnabled(accessFlags);
 	}
 
+	/**
+	 * Returns true if declared transient; not written or read by a persistent object manager.
+	 */
 	public boolean isTransient() {
 		return FieldAccessInfo.TRANSIENT.isEnabled(accessFlags);
 	}
 
+	/**
+	 * Returns true if declared synthetic; not present in the source code.
+	 */
 	public boolean isSynthetic() {
 		return FieldAccessInfo.SYNTHETIC.isEnabled(accessFlags);
 	}
 
+	/**
+	 * Returns true if declared as an element of an enum.
+	 */
 	public boolean isEnum() {
 		return FieldAccessInfo.ENUM.isEnabled(accessFlags);
 	}
 
 	/**
-	 * Get the data-type of the field or null if it couldn't be parsed.
+	 * Returns the data-type of the field or null if it couldn't be parsed.
 	 */
 	public DataDescriptor getDataType() {
 		return dataType;
 	}
 
+	/**
+	 * Returns the attributes associated with the field.
+	 */
 	public AttributeInfo[] getAttributes() {
 		return attributes;
 	}
@@ -107,7 +158,7 @@ public class FieldInfo {
 	}
 
 	/**
-	 * Access information associated with a field.
+	 * Access information associated with a field from the access-flags.
 	 */
 	private static enum FieldAccessInfo {
 		/** Declared public; may be accessed from outside its package */

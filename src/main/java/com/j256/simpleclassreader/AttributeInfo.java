@@ -2,6 +2,7 @@ package com.j256.simpleclassreader;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Information about a an attribute for the class, field, or method.
@@ -25,9 +26,13 @@ public class AttributeInfo {
 	/**
 	 * Read in an attribute.
 	 */
-	public static AttributeInfo read(ClassReader reader, DataInputStream dis) throws IOException {
+	public static AttributeInfo read(DataInputStream dis, ConstantPool constantPool, List<ClassReaderError> errors)
+			throws IOException {
 		int index = dis.readUnsignedShort();
-		String name = reader.findName(index, ClassReaderError.INVALID_ATTRIBUTE_NAME_INDEX);
+		String name = constantPool.findName(index);
+		if (name == null) {
+			errors.add(ClassReaderError.INVALID_ATTRIBUTE_NAME_INDEX);
+		}
 		int length = dis.readInt();
 		dis.skip(length);
 		return new AttributeInfo(name, null);

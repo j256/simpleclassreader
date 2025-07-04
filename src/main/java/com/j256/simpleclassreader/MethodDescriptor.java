@@ -22,10 +22,16 @@ public class MethodDescriptor {
 		this.returnDescriptor = returnDescriptor;
 	}
 
+	/**
+	 * Returns the parameter descriptors.
+	 */
 	public DataDescriptor[] getParameterDataDescriptors() {
 		return parameterDataDescriptors;
 	}
 
+	/**
+	 * Returns the return descriptor.
+	 */
 	public DataDescriptor getReturnDescriptor() {
 		return returnDescriptor;
 	}
