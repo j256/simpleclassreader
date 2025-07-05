@@ -18,66 +18,46 @@ public class ClassReaderTest {
 	public void testStuff() throws IOException {
 		String path = "target/test-classes/" + TestClass.class.getName().replace('.', '/') + ".class";
 		try (InputStream fis = new FileInputStream(path);) {
-			ClassInfo info = ClassReader.readClass(fis);
-			assertNotNull(info);
-			assertEquals(TestClass.class.getName(), info.getClassName());
-			assertEquals(Object.class.getName(), info.getSuperClassName());
+			ClassInfo classInfo = ClassReader.readClass(fis);
+			assertNotNull(classInfo);
+			assertEquals(TestClass.class.getName(), classInfo.getClassName());
+			assertEquals(Object.class.getName(), classInfo.getSuperClassName());
 			Field[] reflectionFields = TestClass.class.getDeclaredFields();
-			FieldInfo[] fields = info.getFields();
-			assertEquals(reflectionFields.length, fields.length);
+			FieldInfo[] fields = classInfo.getFields();
+			// NOTE: there might be artificial fields when running with coverage data
 			for (int i = 0; i < fields.length; i++) {
-				assertEquals(reflectionFields[i].getName(), fields[i].getName());
-				assertEquals(reflectionFields[i].getType().getName(), fields[i].getDataType().getDataClassName());
-				assertEquals(reflectionFields[i].isSynthetic(), fields[i].isSynthetic());
+				Field reflectionField = null;
+				for (Field field : reflectionFields) {
+					if (fields[i].getName().equals(field.getName())) {
+						reflectionField = field;
+					}
+				}
+				assertNotNull(reflectionField);
+				assertEquals(reflectionField.getName(), fields[i].getName());
+				assertEquals(reflectionField.getType().getName(), fields[i].getDataType().getDataClassName());
+				assertEquals(reflectionField.isSynthetic(), fields[i].isSynthetic());
 			}
 			Constructor<?>[] reflectionConstructors = TestClass.class.getDeclaredConstructors();
-			MethodInfo[] constructors = info.getConstructors();
+			MethodInfo[] constructors = classInfo.getConstructors();
 			assertEquals(reflectionConstructors.length, constructors.length);
 			// reflection shows the constructor as the type name
 			Method[] reflectionMethods = TestClass.class.getDeclaredMethods();
-			MethodInfo[] methods = info.getMethods();
-			assertEquals(reflectionMethods.length, methods.length);
+			MethodInfo[] methods = classInfo.getMethods();
+			// NOTE: there might be artificial methods when running with coverage data
 			for (int i = 0; i < methods.length; i++) {
-				assertEquals(reflectionMethods[i].getName(), methods[i].getName());
-				assertEquals(reflectionMethods[i].getReturnType().getName(),
+				Method reflectionMethod = null;
+				for (Method method : reflectionMethods) {
+					if (methods[i].getName().equals(method.getName())) {
+						reflectionMethod = method;
+					}
+				}
+				assertNotNull(reflectionMethod);
+				assertEquals(reflectionMethod.getName(), methods[i].getName());
+				assertEquals(reflectionMethod.getReturnType().getName(),
 						methods[i].getReturnDescriptor().getDataClassName());
-				assertEquals(reflectionMethods[i].isBridge(), methods[i].isBridge());
-				assertEquals(reflectionMethods[i].isVarArgs(), methods[i].isVarargs());
-				assertEquals(reflectionMethods[i].isSynthetic(), methods[i].isSynthetic());
-			}
-		}
-	}
-
-	@Test
-	public void testInfo() throws IOException {
-		String path = "target/test-classes/" + TestClass.class.getName().replace('.', '/') + ".class";
-		try (InputStream fis = new FileInputStream(path);) {
-			ClassInfo info = ClassReader.readClass(fis);
-			assertNotNull(info);
-			assertEquals(TestClass.class.getName(), info.getClassName());
-			assertEquals(Object.class.getName(), info.getSuperClassName());
-			Field[] reflectionFields = TestClass.class.getDeclaredFields();
-			FieldInfo[] fields = info.getFields();
-			assertEquals(reflectionFields.length, fields.length);
-			for (int i = 0; i < fields.length; i++) {
-				assertEquals(reflectionFields[i].getName(), fields[i].getName());
-				assertEquals(reflectionFields[i].getType().getName(), fields[i].getDataType().getDataClassName());
-				assertEquals(reflectionFields[i].isSynthetic(), fields[i].isSynthetic());
-			}
-			Constructor<?>[] reflectionConstructors = TestClass.class.getDeclaredConstructors();
-			MethodInfo[] constructors = info.getConstructors();
-			assertEquals(reflectionConstructors.length, constructors.length);
-			// reflection shows the constructor as the type name
-			Method[] reflectionMethods = TestClass.class.getDeclaredMethods();
-			MethodInfo[] methods = info.getMethods();
-			assertEquals(reflectionMethods.length, methods.length);
-			for (int i = 0; i < methods.length; i++) {
-				assertEquals(reflectionMethods[i].getName(), methods[i].getName());
-				assertEquals(reflectionMethods[i].getReturnType().getName(),
-						methods[i].getReturnDescriptor().getDataClassName());
-				assertEquals(reflectionMethods[i].isBridge(), methods[i].isBridge());
-				assertEquals(reflectionMethods[i].isVarArgs(), methods[i].isVarargs());
-				assertEquals(reflectionMethods[i].isSynthetic(), methods[i].isSynthetic());
+				assertEquals(reflectionMethod.isBridge(), methods[i].isBridge());
+				assertEquals(reflectionMethod.isVarArgs(), methods[i].isVarargs());
+				assertEquals(reflectionMethod.isSynthetic(), methods[i].isSynthetic());
 			}
 		}
 	}
