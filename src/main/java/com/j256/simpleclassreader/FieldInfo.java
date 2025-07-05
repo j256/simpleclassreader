@@ -2,7 +2,10 @@ package com.j256.simpleclassreader;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+
+import com.j256.simpleclassreader.attribute.Attribute;
 
 /**
  * Information about a field that the class has.
@@ -14,13 +17,16 @@ public class FieldInfo {
 	private final int accessFlags;
 	private final String name;
 	private final DataDescriptor dataType;
-	private final AttributeInfo[] attributes;
+	private final AttributeInfo[] attributeInfos;
+	private final Object constantValue;
 
-	public FieldInfo(int accessFlags, String name, DataDescriptor dataType, AttributeInfo[] attributes) {
+	public FieldInfo(int accessFlags, String name, DataDescriptor dataType, AttributeInfo[] attributeInfos,
+			Object constantValue) {
 		this.accessFlags = accessFlags;
 		this.name = name;
 		this.dataType = dataType;
-		this.attributes = attributes;
+		this.attributeInfos = attributeInfos;
+		this.constantValue = constantValue;
 	}
 
 	/**
@@ -53,12 +59,22 @@ public class FieldInfo {
 			dataType = DataDescriptor.fromString(typeStr);
 		}
 		int attributeCount = dis.readUnsignedShort();
-		AttributeInfo[] attributes = new AttributeInfo[attributeCount];
+		Object constantValue = null;
+		List<AttributeInfo> attributeInfos = new ArrayList<>();
 		for (int i = 0; i < attributeCount; i++) {
-			attributes[i] = AttributeInfo.read(dis, constantPool, errors);
+			AttributeInfo attributeInfo = AttributeInfo.read(dis, constantPool, errors);
+			if (attributeInfo == null) {
+				// error already added
+			} else {
+				attributeInfos.add(attributeInfo);
+				if (attributeInfo.getAttribute() == Attribute.CONSTANT_VALUE) {
+					constantValue = attributeInfo.getValue();
+				}
+			}
 		}
 
-		return new FieldInfo(accessFlags, name, dataType, attributes);
+		return new FieldInfo(accessFlags, name, dataType,
+				attributeInfos.toArray(new AttributeInfo[attributeInfos.size()]), constantValue);
 	}
 
 	/**
@@ -146,10 +162,14 @@ public class FieldInfo {
 	}
 
 	/**
-	 * Returns the attributes associated with the field.
+	 * Returns the attribute-info entries associated with the field.
 	 */
-	public AttributeInfo[] getAttributes() {
-		return attributes;
+	public AttributeInfo[] getAttributeInfos() {
+		return attributeInfos;
+	}
+
+	public Object getConstantValue() {
+		return constantValue;
 	}
 
 	@Override

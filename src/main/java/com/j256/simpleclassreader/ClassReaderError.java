@@ -7,13 +7,17 @@ package com.j256.simpleclassreader;
  */
 public enum ClassReaderError {
 	MAGIC_INVALID("magic numbner at the start of the class doesn't match 0xCAFEBABE, maybe not a class"),
-	UNKNOWN_CONSTANT_POOL_INFO("unknown cp-info class struction type"),
+	UNKNOWN_MAJOR_VERSION("unknown major version numnber"),
+	INVALID_CONSTANT_POOL_INFO("invalid constant-pool class struction type"),
 	INVALID_CLASS_NAME_INDEX("class name index does not point to valid location"),
+	INVALID_INTERFACE_NAME_INDEX("interface name index does not point to valid location"),
 	INVALID_FIELD_NAME_INDEX("field name index does not point to valid location"),
 	INVALID_FIELD_DESCRIPTOR_INDEX("field descriptor index does not point to valid location"),
 	INVALID_METHOD_NAME_INDEX("method name index does not point to valid location"),
 	INVALID_METHOD_DESCRIPTOR_INDEX("method descriptor index does not point to valid location"),
 	INVALID_ATTRIBUTE_NAME_INDEX("attribute name index does not point to valid location"),
+	UNKNOWN_ATTRIBUTE_NAME("attribute name is not known to the lubrary"),
+	EXCEPTION_NAME_INDEX("exception name index does not point to valid location"),
 	// end
 	;
 

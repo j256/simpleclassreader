@@ -16,11 +16,13 @@ public class ConstantPool {
 	private final ConstantPoolType[] types;
 	private final int[] indexes;
 	private final String[] names;
+	private final Object[] values;
 
-	private ConstantPool(ConstantPoolType[] types, int[] indexes, String[] names) {
+	private ConstantPool(ConstantPoolType[] types, int[] indexes, String[] names, Object[] values) {
 		this.types = types;
 		this.indexes = indexes;
 		this.names = names;
+		this.values = values;
 	}
 
 	/**
@@ -32,6 +34,7 @@ public class ConstantPool {
 		ConstantPoolType[] types = new ConstantPoolType[numCpEntries];
 		int[] indexes = new int[numCpEntries];
 		String[] names = new String[numCpEntries];
+		Object[] values = new Object[numCpEntries];
 
 		// NOTE: this starts at 1 because all of the indexes are 1 based (facepalm)
 		for (int poolCount = 1; poolCount < numCpEntries; poolCount++) {
@@ -47,13 +50,13 @@ public class ConstantPool {
 					names[poolCount] = readUtf8(dis);
 					break;
 				case INTEGER:
-					readInteger(dis);
+					values[poolCount] = readInteger(dis);
 					break;
 				case FLOAT:
-					readFloat(dis);
+					values[poolCount] = readFloat(dis);
 					break;
 				case LONG:
-					readLong(dis);
+					values[poolCount] = readLong(dis);
 					/*
 					 * From the Java docs: All 8-byte constants take up two entries in the constant_pool table of the
 					 * class file. If a CONSTANT_Long_info or CONSTANT_Double_info structure is the entry at index n in
@@ -65,7 +68,7 @@ public class ConstantPool {
 					poolCount++;
 					break;
 				case DOUBLE:
-					readDouble(dis);
+					values[poolCount] = readDouble(dis);
 					// see CP_INFO_LONG comment above
 					poolCount++;
 					break;
@@ -79,23 +82,23 @@ public class ConstantPool {
 				case FIELD_REF:
 				case METHOD_REF:
 				case INTERFACE_REF:
-					readRef(dis);
+					values[poolCount] = readRef(dis);
 					break;
 				case NAME_AND_TYPE:
-					readNameAndType(dis);
+					values[poolCount] = readNameAndType(dis);
 					break;
 				case METHOD_HANDLE:
-					readMethodHandle(dis);
+					values[poolCount] = readMethodHandle(dis);
 					break;
 				case INVOKE_DYNAMIC:
-					readInvokeDynamic(dis);
+					values[poolCount] = readInvokeDynamic(dis);
 					break;
 				default:
 					return null;
 			}
 		}
 
-		return new ConstantPool(types, indexes, names);
+		return new ConstantPool(types, indexes, names, values);
 	}
 
 	/**
@@ -130,21 +133,27 @@ public class ConstantPool {
 		return findName(index);
 	}
 
+	public Object findValue(int index) {
+		if (index >= values.length) {
+			return null;
+		}
+		return values[index];
+	}
+
 	private static String readUtf8(DataInputStream dis) throws IOException {
 		int nameLength = dis.readUnsignedShort();
 		if (nameLength < 0 && nameLength > 256) {
 			System.err.println("Invalid utf8 name-length: " + nameLength);
 			return null;
 		}
-		byte[] nameBytes = new byte[nameLength];
-		dis.readFully(nameBytes);
+		byte[] nameBytes = IoUtils.readLength(dis, nameLength);
 		return new String(nameBytes, StandardCharsets.UTF_8);
 	}
 
-	@SuppressWarnings("unused")
-	private static void readRef(DataInputStream dis) throws IOException {
+	private static DoubleInt readRef(DataInputStream dis) throws IOException {
 		int classIndex = dis.readUnsignedShort();
 		int nameAndTypeIndex = dis.readUnsignedShort();
+		return new DoubleInt(classIndex, nameAndTypeIndex);
 	}
 
 	private static int readInteger(DataInputStream dis) throws IOException {
@@ -163,22 +172,22 @@ public class ConstantPool {
 		return dis.readDouble();
 	}
 
-	@SuppressWarnings("unused")
-	private static void readNameAndType(DataInputStream dis) throws IOException {
+	private static DoubleInt readNameAndType(DataInputStream dis) throws IOException {
 		int nameIndex = dis.readUnsignedShort();
 		int descriptorIndex = dis.readUnsignedShort();
+		return new DoubleInt(nameIndex, descriptorIndex);
 	}
 
-	@SuppressWarnings("unused")
-	private static void readMethodHandle(DataInputStream dis) throws IOException {
+	private static DoubleInt readMethodHandle(DataInputStream dis) throws IOException {
 		int refKind = dis.read();
 		int referenceIndex = dis.readUnsignedShort();
+		return new DoubleInt(refKind, referenceIndex);
 	}
 
-	@SuppressWarnings("unused")
-	private static void readInvokeDynamic(DataInputStream dis) throws IOException {
+	private static DoubleInt readInvokeDynamic(DataInputStream dis) throws IOException {
 		int bootstrapMethodAttrIndex = dis.readUnsignedShort();
 		int nameAndTypeIndex = dis.readUnsignedShort();
+		return new DoubleInt(bootstrapMethodAttrIndex, nameAndTypeIndex);
 	}
 
 	/**
@@ -283,6 +292,33 @@ public class ConstantPool {
 			} else {
 				return types[code];
 			}
+		}
+	}
+
+	/**
+	 * Two integer entry in constant pool.
+	 */
+	public static class DoubleInt {
+
+		private final int first;
+		private final int second;
+
+		public DoubleInt(int first, int second) {
+			this.first = first;
+			this.second = second;
+		}
+
+		public int getFirst() {
+			return first;
+		}
+
+		public int getSecond() {
+			return second;
+		}
+
+		@Override
+		public String toString() {
+			return first + ":" + second;
 		}
 	}
 }

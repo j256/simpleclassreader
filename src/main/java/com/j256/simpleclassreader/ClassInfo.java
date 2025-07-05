@@ -26,11 +26,11 @@ public class ClassInfo {
 	private final MethodInfo[] constructors;
 	private final MethodInfo[] methods;
 	private final AttributeInfo[] attributes;
-	private final List<ClassReaderError> errors;
+	private final List<ClassReaderError> parseErrors;
 
 	private ClassInfo(int minorVersion, int majorVersion, JdkVersion jdkVersion, int accessFlags, String className,
 			String superClassName, String[] interfaces, FieldInfo[] fields, MethodInfo[] constructors,
-			MethodInfo[] methods, AttributeInfo[] attributes, List<ClassReaderError> errors) {
+			MethodInfo[] methods, AttributeInfo[] attributes, List<ClassReaderError> parseErrors) {
 		this.minorVersion = minorVersion;
 		this.majorVersion = majorVersion;
 		this.jdkVersion = jdkVersion;
@@ -42,7 +42,7 @@ public class ClassInfo {
 		this.constructors = constructors;
 		this.methods = methods;
 		this.attributes = attributes;
-		this.errors = errors;
+		this.parseErrors = parseErrors;
 	}
 
 	public int getMajorVersion() {
@@ -155,8 +155,8 @@ public class ClassInfo {
 	/**
 	 * Return errors from the parse..
 	 */
-	public List<ClassReaderError> getErrors() {
-		return errors;
+	public List<ClassReaderError> getParseErrors() {
+		return parseErrors;
 	}
 
 	/**
@@ -164,43 +164,35 @@ public class ClassInfo {
 	 */
 	public static ClassInfo read(DataInputStream dis) throws IOException {
 
-		List<ClassReaderError> errors = new ArrayList<>();
+		List<ClassReaderError> parseErrors = new ArrayList<>();
 		int magic = dis.readInt();
 		if (magic != CLASS_MAGIC) {
-			errors.add(ClassReaderError.MAGIC_INVALID);
+			parseErrors.add(ClassReaderError.MAGIC_INVALID);
 			return null;
 		}
 		int minorVersion = dis.readUnsignedShort();
 		int majorVersion = dis.readUnsignedShort();
 		JdkVersion jdkVersion = JdkVersion.fromMajor(majorVersion);
+		if (jdkVersion == null) {
+			parseErrors.add(ClassReaderError.UNKNOWN_MAJOR_VERSION);
+			// try to continue
+		}
 
 		ConstantPool constantPool = ConstantPool.read(dis);
 		if (constantPool == null) {
-			errors.add(ClassReaderError.UNKNOWN_CONSTANT_POOL_INFO);
+			parseErrors.add(ClassReaderError.INVALID_CONSTANT_POOL_INFO);
 			return null;
 		}
 
 		int accessFlags = dis.readUnsignedShort();
 		// this class-name
-		int index = dis.readUnsignedShort();
-		String className = constantPool.findClassName(index);
-		if (className == null) {
-			errors.add(ClassReaderError.INVALID_CLASS_NAME_INDEX);
-			return null;
-		}
-		className = className.replace('/', '.');
+		String className = readClassName(dis, constantPool, parseErrors);
 		// super class-name
-		index = dis.readUnsignedShort();
-		String superClassName = constantPool.findClassName(index);
-		if (superClassName == null) {
-			errors.add(ClassReaderError.INVALID_CLASS_NAME_INDEX);
-			return null;
-		}
-		superClassName = superClassName.replace('/', '.');
+		String superClassName = readClassName(dis, constantPool, parseErrors);
 
-		String[] interfaces = readInterfaces(dis, constantPool, errors);
-		FieldInfo[] fields = readFields(dis, constantPool, errors);
-		MethodInfo[] allMethods = readMethods(dis, constantPool, errors);
+		String[] interfaces = readInterfaces(dis, constantPool, parseErrors);
+		FieldInfo[] fields = readFields(dis, constantPool, parseErrors);
+		MethodInfo[] allMethods = readMethods(dis, constantPool, parseErrors);
 		List<MethodInfo> constructorList = new ArrayList<>();
 		List<MethodInfo> methodList = new ArrayList<>();
 		for (MethodInfo method : allMethods) {
@@ -212,51 +204,84 @@ public class ClassInfo {
 		}
 		MethodInfo[] constructors = constructorList.toArray(new MethodInfo[constructorList.size()]);
 		MethodInfo[] methods = methodList.toArray(new MethodInfo[methodList.size()]);
-		AttributeInfo[] attributes = readAttributes(dis, constantPool, errors);
+		AttributeInfo[] attributes = readAttributes(dis, constantPool, parseErrors);
 
 		return new ClassInfo(minorVersion, majorVersion, jdkVersion, accessFlags, className, superClassName, interfaces,
-				fields, constructors, methods, attributes, errors);
+				fields, constructors, methods, attributes, parseErrors);
+	}
+
+	private static String readClassName(DataInputStream dis, ConstantPool constantPool,
+			List<ClassReaderError> parseErrors) throws IOException {
+		int index = dis.readUnsignedShort();
+		String name = constantPool.findClassName(index);
+		if (name == null) {
+			parseErrors.add(ClassReaderError.INVALID_CLASS_NAME_INDEX);
+			return null;
+		}
+		name = name.replace('/', '.');
+		return name;
 	}
 
 	private static String[] readInterfaces(DataInputStream dis, ConstantPool constantPool,
-			List<ClassReaderError> errors) throws IOException {
+			List<ClassReaderError> parseErrors) throws IOException {
 		int num = dis.readUnsignedShort();
-		String[] names = new String[num];
-		for (int i = 0; i < names.length; i++) {
+		List<String> names = new ArrayList<>();
+		for (int i = 0; i < num; i++) {
 			int index = dis.readUnsignedShort();
-			names[i] = constantPool.findClassName(index);
+			String name = constantPool.findClassName(index);
+			if (name == null) {
+				parseErrors.add(ClassReaderError.INVALID_INTERFACE_NAME_INDEX);
+				// try to continue
+			} else {
+				names.add(name);
+			}
 		}
-		return names;
+		return names.toArray(new String[names.size()]);
 	}
 
 	private static FieldInfo[] readFields(DataInputStream dis, ConstantPool constantPool, List<ClassReaderError> errors)
 			throws IOException {
 		int num = dis.readUnsignedShort();
-		FieldInfo[] fields = new FieldInfo[num];
-		for (int i = 0; i < fields.length; i++) {
-			fields[i] = FieldInfo.read(dis, constantPool, errors);
+		List<FieldInfo> fields = new ArrayList<>();
+		for (int i = 0; i < num; i++) {
+			FieldInfo field = FieldInfo.read(dis, constantPool, errors);
+			if (field == null) {
+				// try to continue
+			} else {
+				fields.add(field);
+			}
 		}
-		return fields;
+		return fields.toArray(new FieldInfo[fields.size()]);
 	}
 
 	private static MethodInfo[] readMethods(DataInputStream dis, ConstantPool constantPool,
 			List<ClassReaderError> errors) throws IOException {
 		int num = dis.readUnsignedShort();
-		MethodInfo[] methods = new MethodInfo[num];
-		for (int i = 0; i < methods.length; i++) {
-			methods[i] = MethodInfo.read(dis, constantPool, errors);
+		List<MethodInfo> methods = new ArrayList<>();
+		for (int i = 0; i < num; i++) {
+			MethodInfo method = MethodInfo.read(dis, constantPool, errors);
+			if (method == null) {
+				// try to continue
+			} else {
+				methods.add(method);
+			}
 		}
-		return methods;
+		return methods.toArray(new MethodInfo[methods.size()]);
 	}
 
 	private static AttributeInfo[] readAttributes(DataInputStream dis, ConstantPool constantPool,
 			List<ClassReaderError> errors) throws IOException {
 		int num = dis.readUnsignedShort();
-		AttributeInfo[] attributes = new AttributeInfo[num];
-		for (int i = 0; i < attributes.length; i++) {
-			attributes[i] = AttributeInfo.read(dis, constantPool, errors);
+		List<AttributeInfo> attributes = new ArrayList<>();
+		for (int i = 0; i < num; i++) {
+			AttributeInfo attribute = AttributeInfo.read(dis, constantPool, errors);
+			if (attribute == null) {
+				// try to continue
+			} else {
+				attributes.add(attribute);
+			}
 		}
-		return attributes;
+		return attributes.toArray(new AttributeInfo[attributes.size()]);
 	}
 
 	/**
@@ -286,19 +311,6 @@ public class ClassInfo {
 
 		private ClassAccessInfo(int bit) {
 			this.bit = bit;
-		}
-
-		/**
-		 * Get the access info array from the access flags.
-		 */
-		public static ClassAccessInfo[] fromAccessFlags(int accessFlags) {
-			List<ClassAccessInfo> accessInfos = new ArrayList<>();
-			for (ClassAccessInfo info : values()) {
-				if ((info.bit & accessFlags) != 0) {
-					accessInfos.add(info);
-				}
-			}
-			return accessInfos.toArray(new ClassAccessInfo[accessInfos.size()]);
 		}
 
 		/**
