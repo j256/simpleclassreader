@@ -33,12 +33,12 @@ public enum AttributeType {
 			return result;
 		}
 	},
-	Exceptions("Exceptions") {
+	EXCEPTIONS("Exceptions") {
 		@Override
 		public <T> T read(DataInputStream dis, int length, ConstantPool constantPool,
 				List<ClassReaderError> parseErrors) throws IOException {
 			@SuppressWarnings("unchecked")
-			T result = (T) Exceptions.read(dis, length, constantPool, parseErrors);
+			T result = (T) ExceptionsAttribute.read(dis, constantPool, parseErrors);
 			return result;
 		}
 	}
