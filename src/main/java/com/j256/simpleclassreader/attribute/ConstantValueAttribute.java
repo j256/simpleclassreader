@@ -8,7 +8,7 @@ import com.j256.simpleclassreader.ClassReaderError;
 import com.j256.simpleclassreader.ConstantPool;
 
 /**
- * ConstantValue attribute
+ * ConstantValue attribute.
  * 
  * @author graywatson
  */

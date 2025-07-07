@@ -4,20 +4,20 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.List;
 
-import com.j256.simpleclassreader.attribute.Attribute;
+import com.j256.simpleclassreader.attribute.AttributeType;
 
 /**
- * Information about a an attribute for the class, field, or method.
+ * Information about a an attribute of a class, field, or method.
  * 
  * @author graywatson
  */
 public class AttributeInfo {
 
 	private final String name;
-	private final Attribute attribute;
+	private final AttributeType attribute;
 	private final Object value;
 
-	public AttributeInfo(String name, Attribute attribute, Object value) {
+	public AttributeInfo(String name, AttributeType attribute, Object value) {
 		this.name = name;
 		this.attribute = attribute;
 		this.value = value;
@@ -40,7 +40,7 @@ public class AttributeInfo {
 			// try and continue
 		}
 		int length = dis.readInt();
-		Attribute attribute = Attribute.fromString(name);
+		AttributeType attribute = AttributeType.fromString(name);
 		if (attribute == null) {
 			parseErrors.add(ClassReaderError.UNKNOWN_ATTRIBUTE_NAME);
 			// skip over the rest of the attribute
@@ -55,7 +55,7 @@ public class AttributeInfo {
 		return name;
 	}
 
-	public Attribute getAttribute() {
+	public AttributeType getAttribute() {
 		return attribute;
 	}
 

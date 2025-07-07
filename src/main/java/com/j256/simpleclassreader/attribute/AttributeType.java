@@ -14,7 +14,7 @@ import com.j256.simpleclassreader.ConstantPool;
  * 
  * @author graywatson
  */
-public enum Attribute {
+public enum AttributeType {
 	CONSTANT_VALUE("ConstantValue") {
 		@Override
 		public <T> T read(DataInputStream dis, int length, ConstantPool constantPool,
@@ -45,24 +45,24 @@ public enum Attribute {
 	// end
 	;
 
-	private static final Map<String, Attribute> nameMap = new HashMap<>();
+	private static final Map<String, AttributeType> nameMap = new HashMap<>();
 
 	private final String name;
 
 	static {
-		for (Attribute attribute : values()) {
+		for (AttributeType attribute : values()) {
 			nameMap.put(attribute.name, attribute);
 		}
 	}
 
-	private Attribute(String name) {
+	private AttributeType(String name) {
 		this.name = name;
 	}
 
 	/**
 	 * Return the attribute
 	 */
-	public static Attribute fromString(String name) {
+	public static AttributeType fromString(String name) {
 		return nameMap.get(name);
 	}
 

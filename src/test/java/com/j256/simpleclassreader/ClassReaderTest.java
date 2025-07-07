@@ -1,7 +1,9 @@
 package com.j256.simpleclassreader;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -62,6 +64,52 @@ public class ClassReaderTest {
 		}
 	}
 
+	@Test
+	public void testCoverage() throws IOException {
+		String path = "target/test-classes/" + TestClass.class.getName().replace('.', '/') + ".class";
+		try (InputStream fis = new FileInputStream(path);) {
+			ClassInfo info = ClassReader.readClass(fis);
+			int major = info.getMajorVersion();
+			assertTrue(major > 50);
+			assertEquals(0, info.getMinorVersion());
+			assertEquals(JdkVersion.fromMajor(major).getJdkString() + ".0", info.getJdkVersionString());
+			assertTrue(info.getAccessFlags() != 0);
+			assertFalse(info.isAbstract());
+			assertFalse(info.isSynthetic());
+			assertFalse(info.isAnnotation());
+			assertFalse(info.isFinal());
+			assertFalse(info.isInterface());
+			assertFalse(info.isEnum());
+			assertFalse(info.isModule());
+			// XXX: why?
+			assertTrue(info.isSuper());
+			String[] interfaces = info.getInterfaces();
+			assertEquals(1, interfaces.length);
+			assertEquals(Runnable.class.getName(), interfaces[0]);
+		}
+	}
+
+	@Test
+	public void testInterface() throws IOException {
+		String path = "target/test-classes/" + TestInterface.class.getName().replace('.', '/') + ".class";
+		try (InputStream fis = new FileInputStream(path);) {
+			ClassInfo info = ClassReader.readClass(fis);
+			int major = info.getMajorVersion();
+			assertTrue(major > 50);
+			assertEquals(0, info.getMinorVersion());
+			assertEquals(JdkVersion.fromMajor(major).getJdkString() + ".0", info.getJdkVersionString());
+			assertTrue(info.getAccessFlags() != 0);
+			assertTrue(info.isAbstract());
+			assertFalse(info.isSynthetic());
+			assertFalse(info.isAnnotation());
+			assertFalse(info.isFinal());
+			assertTrue(info.isInterface());
+			assertFalse(info.isEnum());
+			assertFalse(info.isModule());
+			assertFalse(info.isSuper());
+		}
+	}
+
 	@SuppressWarnings("unused")
 	private static class TestClass implements Runnable {
 
@@ -83,5 +131,10 @@ public class ClassReaderTest {
 		public void run() {
 			// do thread stuff
 		}
+	}
+
+	@SuppressWarnings("unused")
+	private static interface TestInterface extends Runnable {
+		public float changeBar(String message, float newBar);
 	}
 }

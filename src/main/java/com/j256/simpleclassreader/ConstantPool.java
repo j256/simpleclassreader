@@ -7,9 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Simple class that reads the first couple of bytes from a class to get the name and the JDK version.
- * 
- * Based on: https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-4.html
+ * Internal class "constant pool" which stores the strings and other data items used by the various other parts of the
+ * class metadata. The metadata is often an index into the constant-pool.
  */
 public class ConstantPool {
 

@@ -9,7 +9,7 @@ import com.j256.simpleclassreader.ClassReaderError;
 import com.j256.simpleclassreader.ConstantPool;
 
 /**
- * ConstantValue attribute
+ * Exceptions that are thrown by a method attribute.
  * 
  * @author graywatson
  */

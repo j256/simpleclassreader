@@ -71,11 +71,11 @@ public enum JdkVersion {
 		return majorVersion;
 	}
 
-	public String getJdk() {
+	public String getJdkString() {
 		return jdk;
 	}
 
-	public String makeJdk(int minorVersion) {
+	public String makeJdkString(int minorVersion) {
 		if (jdk.indexOf('.') >= 0) {
 			return jdk;
 		} else {

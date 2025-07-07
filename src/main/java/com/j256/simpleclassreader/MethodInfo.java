@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Information about a field that the class has.
+ * Information about a method of a class.
  * 
  * @author graywatson
  */

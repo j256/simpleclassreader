@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Utility class that reads in the {@link ClassInfo} structure.
+ * Utility class that reads in a {@link ClassInfo}.
  */
 public class ClassReader {
 

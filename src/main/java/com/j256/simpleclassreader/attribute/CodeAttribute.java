@@ -11,7 +11,7 @@ import com.j256.simpleclassreader.ConstantPool;
 import com.j256.simpleclassreader.IoUtils;
 
 /**
- * ConstantValue attribute
+ * Code attribute that stores the compiled code.
  * 
  * @author graywatson
  */

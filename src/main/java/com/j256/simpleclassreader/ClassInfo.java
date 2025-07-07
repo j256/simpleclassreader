@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Class information structure.
+ * The metadata and other information about a class.
  * 
  * Based on: https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-4.html
  */
@@ -56,11 +56,11 @@ public class ClassInfo {
 	/**
 	 * Return the string version of the JDK based on the major and minor numbers.
 	 */
-	public String getJdkVersion() {
+	public String getJdkVersionString() {
 		if (jdkVersion == null) {
 			return UNKNOWN_VERSION;
 		} else {
-			return jdkVersion.makeJdk(minorVersion);
+			return jdkVersion.makeJdkString(minorVersion);
 		}
 	}
 
@@ -71,34 +71,58 @@ public class ClassInfo {
 		return accessFlags;
 	}
 
+	/**
+	 * Declared final; no subclasses allowed.
+	 */
 	public boolean isFinal() {
 		return ClassAccessInfo.FINAL.isEnabled(accessFlags);
 	}
 
+	/**
+	 * Treat superclass methods specially when invoked by the invoke-special instruction.
+	 */
 	public boolean isSuper() {
 		return ClassAccessInfo.SUPER.isEnabled(accessFlags);
 	}
 
+	/**
+	 * Is an interface, not a class.
+	 */
 	public boolean isInterface() {
 		return ClassAccessInfo.INTERFACE.isEnabled(accessFlags);
 	}
 
+	/**
+	 * Declared abstract; must not be instantiated.
+	 */
 	public boolean isAbstract() {
 		return ClassAccessInfo.ABSTRACT.isEnabled(accessFlags);
 	}
 
+	/**
+	 * Declared synthetic; not present in the source code.
+	 */
 	public boolean isSynthetic() {
 		return ClassAccessInfo.SYNTHETIC.isEnabled(accessFlags);
 	}
 
+	/**
+	 * Declared as an annotation type.
+	 */
 	public boolean isAnnotation() {
 		return ClassAccessInfo.ANNOTATION.isEnabled(accessFlags);
 	}
 
+	/**
+	 * Declared as an enum type.
+	 */
 	public boolean isEnum() {
 		return ClassAccessInfo.ENUM.isEnabled(accessFlags);
 	}
 
+	/**
+	 * Is a module, not a class or interface.
+	 */
 	public boolean isModule() {
 		return ClassAccessInfo.MODULE.isEnabled(accessFlags);
 	}
@@ -233,6 +257,7 @@ public class ClassInfo {
 				parseErrors.add(ClassReaderError.INVALID_INTERFACE_NAME_INDEX);
 				// try to continue
 			} else {
+				name = name.replace('/', '.');
 				names.add(name);
 			}
 		}

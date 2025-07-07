@@ -1,7 +1,7 @@
 package com.j256.simpleclassreader;
 
 /**
- * Type of field, method parameter, or return value.
+ * Type of field, method parameter, or method return value.
  * 
  * @author graywatson
  */

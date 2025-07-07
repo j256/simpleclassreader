@@ -5,10 +5,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.j256.simpleclassreader.attribute.Attribute;
+import com.j256.simpleclassreader.attribute.AttributeType;
 
 /**
- * Information about a field that the class has.
+ * Information about a field of a class.
  * 
  * @author graywatson
  */
@@ -67,7 +67,7 @@ public class FieldInfo {
 				// error already added
 			} else {
 				attributeInfos.add(attributeInfo);
-				if (attributeInfo.getAttribute() == Attribute.CONSTANT_VALUE) {
+				if (attributeInfo.getAttribute() == AttributeType.CONSTANT_VALUE) {
 					constantValue = attributeInfo.getValue();
 				}
 			}
