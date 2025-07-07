@@ -8,10 +8,12 @@ Simple Java Class Reader
 [![CircleCI](https://circleci.com/gh/j256/simpleclassreader.svg?style=shield)](https://circleci.com/gh/j256/simpleclassreader)
 [![GitHub License](https://img.shields.io/github/license/j256/simpleclassreader)](https://github.com/j256/simpleclassreader/blob/master/LICENSE.txt)
 
-Little library that allows you to read class bytes and see all of the class metadata without loading the class which
+library that allows you to read class bytes and see all of the class metadata without loading the class which
 might cause a large amount of class loading from imports.  There are a number of times you might want to do this if
 you wanted to interrogate a class to make sure that it has certain annotations or qualities before incurring the
 cost of loading it with the ClassLoader.
+
+This is based (of course) on the [Java class format documentation](https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-4.html).
 
 Enjoy.  Gray Watson
 
