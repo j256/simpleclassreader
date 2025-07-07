@@ -2,7 +2,11 @@ package com.j256.simpleclassreader;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+
+import com.j256.simpleclassreader.attribute.AttributeType;
+import com.j256.simpleclassreader.attribute.ExceptionsAttribute;
 
 /**
  * Information about a method of a class.
@@ -17,13 +21,16 @@ public class MethodInfo {
 	private final String name;
 	private final MethodDescriptor methodDescriptor;
 	private final AttributeInfo[] attributes;
+	private final String[] exceptions;
 	private final boolean constructor;
 
-	public MethodInfo(int accessFlags, String name, MethodDescriptor methodDescriptor, AttributeInfo[] attributes) {
+	public MethodInfo(int accessFlags, String name, MethodDescriptor methodDescriptor, AttributeInfo[] attributes,
+			String[] exceptions) {
 		this.accessFlags = accessFlags;
 		this.name = name;
 		this.methodDescriptor = methodDescriptor;
 		this.attributes = attributes;
+		this.exceptions = exceptions;
 		this.constructor = CONSTRUCTOR_METHOD_NAME.equals(name);
 	}
 
@@ -57,12 +64,21 @@ public class MethodInfo {
 			methodDescriptor = MethodDescriptor.fromString(descriptorStr);
 		}
 		int attributeCount = dis.readUnsignedShort();
-		AttributeInfo[] attributes = new AttributeInfo[attributeCount];
+		List<AttributeInfo> attributes = new ArrayList<>();
+		String[] exceptions = null;
 		for (int i = 0; i < attributeCount; i++) {
-			attributes[i] = AttributeInfo.read(dis, constantPool, errors);
+			AttributeInfo attribute = AttributeInfo.read(dis, constantPool, errors);
+			if (attribute == null) {
+				continue;
+			}
+			if (attribute.getType() == AttributeType.EXCEPTIONS) {
+				exceptions = ((ExceptionsAttribute) attribute.getValue()).getExceptions();
+			}
+			attributes.add(attribute);
 		}
 
-		return new MethodInfo(accessFlags, name, methodDescriptor, attributes);
+		return new MethodInfo(accessFlags, name, methodDescriptor,
+				attributes.toArray(new AttributeInfo[attributes.size()]), exceptions);
 	}
 
 	/**
@@ -204,6 +220,13 @@ public class MethodInfo {
 		} else {
 			return methodDescriptor.getReturnDescriptor();
 		}
+	}
+
+	/**
+	 * Exceptions extracted from the attributes.
+	 */
+	public String[] getExceptions() {
+		return exceptions;
 	}
 
 	@Override

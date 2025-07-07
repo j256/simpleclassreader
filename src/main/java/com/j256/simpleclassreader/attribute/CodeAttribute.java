@@ -8,7 +8,7 @@ import java.util.List;
 import com.j256.simpleclassreader.AttributeInfo;
 import com.j256.simpleclassreader.ClassReaderError;
 import com.j256.simpleclassreader.ConstantPool;
-import com.j256.simpleclassreader.IoUtils;
+import com.j256.simpleclassreader.Utils;
 
 /**
  * Code attribute that stores the compiled code.
@@ -54,7 +54,7 @@ public class CodeAttribute {
 		int maxStack = dis.readUnsignedShort();
 		int maxLocals = dis.readUnsignedShort();
 		int codeLength = dis.readInt();
-		byte[] code = IoUtils.readLength(dis, codeLength);
+		byte[] code = Utils.readLength(dis, codeLength);
 		int exceptionTableLength = dis.readUnsignedShort();
 		ExceptionTable[] exceptions = new ExceptionTable[exceptionTableLength];
 		for (int i = 0; i < exceptions.length; i++) {

@@ -145,7 +145,7 @@ public class ConstantPool {
 			System.err.println("Invalid utf8 name-length: " + nameLength);
 			return null;
 		}
-		byte[] nameBytes = IoUtils.readLength(dis, nameLength);
+		byte[] nameBytes = Utils.readLength(dis, nameLength);
 		return new String(nameBytes, StandardCharsets.UTF_8);
 	}
 

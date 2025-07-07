@@ -67,7 +67,7 @@ public class FieldInfo {
 				// error already added
 			} else {
 				attributeInfos.add(attributeInfo);
-				if (attributeInfo.getAttribute() == AttributeType.CONSTANT_VALUE) {
+				if (attributeInfo.getType() == AttributeType.CONSTANT_VALUE) {
 					constantValue = attributeInfo.getValue();
 				}
 			}

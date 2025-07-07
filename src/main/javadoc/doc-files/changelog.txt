@@ -1,2 +1,6 @@
+0.2: 07/07/2025
+	* Fixed problem with the exception attribute.  Half baked check in there. 
+	* Still fleshing out tests.
+
 0.1: 07/05/2025
 	* Initial version.  Coding seems to be stabilizing although things are a bit rough.

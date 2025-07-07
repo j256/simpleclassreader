@@ -242,7 +242,7 @@ public class ClassInfo {
 			parseErrors.add(ClassReaderError.INVALID_CLASS_NAME_INDEX);
 			return null;
 		}
-		name = name.replace('/', '.');
+		name = Utils.classPathToPackage(name);
 		return name;
 	}
 
@@ -257,7 +257,7 @@ public class ClassInfo {
 				parseErrors.add(ClassReaderError.INVALID_INTERFACE_NAME_INDEX);
 				// try to continue
 			} else {
-				name = name.replace('/', '.');
+				name = Utils.classPathToPackage(name);
 				names.add(name);
 			}
 		}

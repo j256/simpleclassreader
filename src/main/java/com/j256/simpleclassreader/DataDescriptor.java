@@ -49,8 +49,7 @@ public class DataDescriptor {
 		String className = null;
 		if (baseType == BaseType.REFERENCE) {
 			int end = str.indexOf(';', index);
-			className = str.substring(index, end);
-			className = className.replace('/', '.');
+			className = Utils.classPathToPackage(str.substring(index, end));
 			index = end + 1;
 		}
 

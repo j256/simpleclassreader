@@ -14,12 +14,12 @@ import com.j256.simpleclassreader.attribute.AttributeType;
 public class AttributeInfo {
 
 	private final String name;
-	private final AttributeType attribute;
+	private final AttributeType type;
 	private final Object value;
 
-	public AttributeInfo(String name, AttributeType attribute, Object value) {
+	public AttributeInfo(String name, AttributeType type, Object value) {
 		this.name = name;
-		this.attribute = attribute;
+		this.type = type;
 		this.value = value;
 	}
 
@@ -40,23 +40,23 @@ public class AttributeInfo {
 			// try and continue
 		}
 		int length = dis.readInt();
-		AttributeType attribute = AttributeType.fromString(name);
-		if (attribute == null) {
+		AttributeType type = AttributeType.fromString(name);
+		if (type == null) {
 			parseErrors.add(ClassReaderError.UNKNOWN_ATTRIBUTE_NAME);
 			// skip over the rest of the attribute
 			dis.skip(length);
 			return null;
 		}
-		Object value = attribute.read(dis, length, constantPool, parseErrors);
-		return new AttributeInfo(name, attribute, value);
+		Object value = type.read(dis, length, constantPool, parseErrors);
+		return new AttributeInfo(name, type, value);
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public AttributeType getAttribute() {
-		return attribute;
+	public AttributeType getType() {
+		return type;
 	}
 
 	public Object getValue() {

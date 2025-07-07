@@ -39,7 +39,7 @@ Maven packages are published via [![Maven Central](https://maven-badges.herokuap
 <dependency>
 	<groupId>com.j256.simpleclassreader</groupId>
 	<artifactId>simpleclassreader</artifactId>
-	<version>0.1</version>
+	<version>0.2</version>
 </dependency>
 ```
 

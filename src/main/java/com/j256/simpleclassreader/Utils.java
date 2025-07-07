@@ -5,17 +5,17 @@ import java.io.DataInputStream;
 import java.io.IOException;
 
 /**
- * Some central IO methods.
+ * Some central utility methods.
  * 
  * @author graywatson
  */
-public class IoUtils {
+public class Utils {
 
 	private static final int BUFFER_SIZE = 8192;
 
 	/**
 	 * Read in length bytes. We jump through these hoops because we are worried that length is invalid and we want to
-	 * hit the EOF before we do the new byte[length].
+	 * hit the EOF before we do the new byte[length] and possibly allocate a huge buffer unnecessarily.
 	 */
 	public static byte[] readLength(DataInputStream dis, int length) throws IOException {
 		if (length <= BUFFER_SIZE) {
@@ -35,5 +35,16 @@ public class IoUtils {
 			length -= max;
 		}
 		return baos.toByteArray();
+	}
+
+	/**
+	 * Convert from a class path with '/' to a package with '.'.
+	 */
+	public static String classPathToPackage(String path) {
+		if (path == null || path.isEmpty()) {
+			return path;
+		} else {
+			return path.replace('/', '.');
+		}
 	}
 }

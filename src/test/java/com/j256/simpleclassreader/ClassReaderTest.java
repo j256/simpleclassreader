@@ -18,7 +18,7 @@ public class ClassReaderTest {
 
 	@Test
 	public void testStuff() throws IOException {
-		String path = "target/test-classes/" + TestClass.class.getName().replace('.', '/') + ".class";
+		String path = classToPath(TestClass.class);
 		try (InputStream fis = new FileInputStream(path);) {
 			ClassInfo classInfo = ClassReader.readClass(fis);
 			assertNotNull(classInfo);
@@ -66,7 +66,7 @@ public class ClassReaderTest {
 
 	@Test
 	public void testCoverage() throws IOException {
-		String path = "target/test-classes/" + TestClass.class.getName().replace('.', '/') + ".class";
+		String path = classToPath(TestClass.class);
 		try (InputStream fis = new FileInputStream(path);) {
 			ClassInfo info = ClassReader.readClass(fis);
 			int major = info.getMajorVersion();
@@ -90,8 +90,28 @@ public class ClassReaderTest {
 	}
 
 	@Test
+	public void testExceptions() throws IOException {
+		String path = classToPath(TestClass.class);
+		try (InputStream fis = new FileInputStream(path);) {
+			ClassInfo info = ClassReader.readClass(fis);
+			MethodInfo[] methods = info.getMethods();
+			boolean found = false;
+			for (MethodInfo method : methods) {
+				if ("changeBar".equals(method.getName())) {
+					String[] exceptions = method.getExceptions();
+					assertNotNull(exceptions);
+					assertEquals(1, exceptions.length);
+					assertEquals("java.io.IOException", exceptions[0]);
+					found = true;
+				}
+			}
+			assertTrue(found);
+		}
+	}
+
+	@Test
 	public void testInterface() throws IOException {
-		String path = "target/test-classes/" + TestInterface.class.getName().replace('.', '/') + ".class";
+		String path = classToPath(TestInterface.class);
 		try (InputStream fis = new FileInputStream(path);) {
 			ClassInfo info = ClassReader.readClass(fis);
 			int major = info.getMajorVersion();
@@ -110,6 +130,10 @@ public class ClassReaderTest {
 		}
 	}
 
+	private String classToPath(Class<?> clazz) {
+		return "target/test-classes/" + clazz.getName().replace('.', '/') + ".class";
+	}
+
 	@SuppressWarnings("unused")
 	private static class TestClass implements Runnable {
 
@@ -122,7 +146,7 @@ public class ClassReaderTest {
 		}
 
 		@Deprecated
-		public float changeBar(String message, float newBar) {
+		public float changeBar(String message, float newBar) throws IOException {
 			bar = newBar;
 			return bar;
 		}

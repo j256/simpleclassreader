@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.j256.simpleclassreader.ClassReaderError;
 import com.j256.simpleclassreader.ConstantPool;
+import com.j256.simpleclassreader.Utils;
 
 /**
  * Exceptions that are thrown by a method attribute.
@@ -37,6 +38,8 @@ public class ExceptionsAttribute {
 			if (name == null) {
 				parseErrors.add(ClassReaderError.EXCEPTION_NAME_INDEX);
 			} else {
+				// another class that has / instead of . in the path
+				name = Utils.classPathToPackage(name);
 				exceptions.add(name);
 			}
 		}
