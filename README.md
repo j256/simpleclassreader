@@ -13,7 +13,7 @@ might cause a large amount of class loading from imports.  There are a number of
 you wanted to interrogate a class to make sure that it has certain annotations or qualities before incurring the
 cost of loading it with the ClassLoader.
 
-This is based (of course) on the [Java class format documentation](https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-4.html).
+This is based on the [Java class format documentation](https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-4.html).
 
 Enjoy.  Gray Watson
 
@@ -33,7 +33,7 @@ Read in a class from a file.
 
 # Maven Configuration
 
-Maven packages are published via [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.j256.simplecsv/simplecsv/badge.svg?style=flat-square)](https://maven-badges.herokuapp.com/maven-central/com.j256.simplecsv/simplecsv/)
+Maven packages are published via [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.j256.simpleclassreader/simpleclassreader/badge.svg?style=flat-square)](https://mvnrepository.com/artifact/com.j256.simpleclassreader/simpleclassreader/latest)
 
 ``` xml
 <dependency>
