@@ -56,4 +56,25 @@ public class ClassReader {
 			return ClassInfo.read(dis);
 		}
 	}
+
+	/**
+	 * Enum which allows the caller to limit the reader to the parts of the class that you actually care about. It can
+	 * speed up some of the processing and maybe some of the I/O. If you only care about the class attributes, you will
+	 * need to read the fields and methods because they are ahead of the attributes on disk but the various data
+	 * elements will not be created.
+	 */
+	public static enum ClassParts {
+		/** load in the field information */
+		FIELDS,
+		/** load in the method information */
+		METHODS,
+		/** pay attention to the class level attributes */
+		CLASS_ATTRIBUTES,
+		/** pay attention to the field level attributes */
+		FIELD_ATTRIBUTES,
+		/** pay attention to the method level attributes */
+		METHOD_ATTRIBUTES,
+		// end
+		;
+	}
 }

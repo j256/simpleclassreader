@@ -3,6 +3,7 @@ package com.j256.simpleclassreader.attribute;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.j256.simpleclassreader.ClassReaderError;
@@ -36,7 +37,7 @@ public class ExceptionsAttribute {
 			int index = dis.readUnsignedShort();
 			String name = constantPool.findClassName(index);
 			if (name == null) {
-				parseErrors.add(ClassReaderError.EXCEPTION_NAME_INDEX);
+				parseErrors.add(ClassReaderError.EXCEPTION_NAME_INDEX_INVALID);
 			} else {
 				// another class that has / instead of . in the path
 				name = Utils.classPathToPackage(name);
@@ -49,5 +50,10 @@ public class ExceptionsAttribute {
 
 	public String[] getExceptions() {
 		return exceptions;
+	}
+
+	@Override
+	public String toString() {
+		return Arrays.toString(exceptions);
 	}
 }

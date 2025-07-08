@@ -73,7 +73,7 @@ public class ClassInfo {
 
 		ConstantPool constantPool = ConstantPool.read(dis);
 		if (constantPool == null) {
-			parseErrors.add(ClassReaderError.INVALID_CONSTANT_POOL_INFO);
+			parseErrors.add(ClassReaderError.CONSTANT_POOL_INFO_INVALID);
 			return null;
 		}
 
@@ -256,7 +256,7 @@ public class ClassInfo {
 		int index = dis.readUnsignedShort();
 		String name = constantPool.findClassName(index);
 		if (name == null) {
-			parseErrors.add(ClassReaderError.INVALID_CLASS_NAME_INDEX);
+			parseErrors.add(ClassReaderError.CLASS_NAME_INDEX_INVALID);
 			return null;
 		}
 		name = Utils.classPathToPackage(name);
@@ -271,7 +271,7 @@ public class ClassInfo {
 			int index = dis.readUnsignedShort();
 			String name = constantPool.findClassName(index);
 			if (name == null) {
-				parseErrors.add(ClassReaderError.INVALID_INTERFACE_NAME_INDEX);
+				parseErrors.add(ClassReaderError.INTERFACE_NAME_INDEX_INVALID);
 				// try to continue
 			} else {
 				name = Utils.classPathToPackage(name);

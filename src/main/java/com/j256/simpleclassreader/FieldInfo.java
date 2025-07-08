@@ -49,20 +49,20 @@ public class FieldInfo {
 		int index = dis.readUnsignedShort();
 		String name = constantPool.findName(index);
 		if (name == null) {
-			errors.add(ClassReaderError.INVALID_FIELD_NAME_INDEX);
+			errors.add(ClassReaderError.FIELD_NAME_INDEX_INVALID);
 			return null;
 		}
 		index = dis.readUnsignedShort();
 		String typeStr = constantPool.findName(index);
 		if (typeStr == null) {
-			errors.add(ClassReaderError.INVALID_FIELD_DATA_DESCRIPTOR_INDEX);
+			errors.add(ClassReaderError.FIELD_DATA_DESCRIPTOR_INDEX_INVALID);
 			return null;
 		}
 		DataDescriptor dataDescriptor = null;
 		if (typeStr != null) {
 			dataDescriptor = DataDescriptor.fromString(typeStr);
 			if (dataDescriptor == null) {
-				errors.add(ClassReaderError.INVALID_FIELD_DATA_DESCRIPTOR);
+				errors.add(ClassReaderError.FIELD_DATA_DESCRIPTOR_INVALID);
 				return null;
 			}
 		}

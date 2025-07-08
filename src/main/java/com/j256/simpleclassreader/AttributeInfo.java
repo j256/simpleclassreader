@@ -38,13 +38,13 @@ public class AttributeInfo {
 		int index = dis.readUnsignedShort();
 		String name = constantPool.findName(index);
 		if (name == null) {
-			parseErrors.add(ClassReaderError.INVALID_ATTRIBUTE_NAME_INDEX);
+			parseErrors.add(ClassReaderError.ATTRIBUTE_NAME_INDEX_INVALID);
 			// try and continue
 		}
 		int length = dis.readInt();
 		AttributeType type = AttributeType.fromString(name);
 		if (type == null) {
-			parseErrors.add(ClassReaderError.UNKNOWN_ATTRIBUTE_NAME);
+			parseErrors.add(ClassReaderError.ATTRIBUTE_NAME_UNKNOWN);
 			// skip over the rest of the attribute
 			dis.skip(length);
 			return null;

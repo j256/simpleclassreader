@@ -17,7 +17,7 @@ import java.lang.reflect.Method;
 import org.junit.Test;
 
 import com.j256.simpleclassreader.attribute.AnnotationInfo;
-import com.j256.simpleclassreader.attribute.AnnotationInfo.AnnotationValue;
+import com.j256.simpleclassreader.attribute.AnnotationNameValue;
 
 public class ClassReaderTest {
 
@@ -139,9 +139,9 @@ public class ClassReaderTest {
 			AnnotationInfo[] annotations = info.getRuntimeAnnotations();
 			assertNotNull(annotations);
 			assertEquals(1, annotations.length);
-			AnnotationValue[] values = annotations[0].getValues();
+			AnnotationNameValue[] values = annotations[0].getValues();
 			assertNotNull(values);
-			assertEquals(9, values.length);
+			assertEquals(12, values.length);
 			assertEquals((byte) 123, values[0].getConstValue());
 			assertEquals('h', values[1].getConstValue());
 			assertEquals((short) 31241, values[2].getConstValue());
@@ -151,6 +151,16 @@ public class ClassReaderTest {
 			assertEquals(21348.2323D, values[6].getConstValue());
 			assertEquals("hello", values[7].getConstValue());
 			assertEquals(true, values[8].getConstValue());
+			assertEquals(MyNum.class.getName(), values[9].getEnumValue().getType());
+			assertEquals(MyNum.BAR.name(), values[9].getEnumValue().getConstant());
+			assertEquals(String.class.getName(), values[10].getClassValue());
+			AnnotationNameValue[] arrayValues = values[11].getArrayValues();
+			assertNotNull(arrayValues);
+			// should match [ 1, 2, 3 ]
+			assertEquals(3, arrayValues.length);
+			assertEquals(2, arrayValues[0].getConstValue());
+			assertEquals(4, arrayValues[1].getConstIntValue());
+			assertEquals(8, arrayValues[2].getConstIntValue());
 			System.err.println("parse errors: " + info.getParseErrors());
 		}
 	}
@@ -205,12 +215,26 @@ public class ClassReaderTest {
 		public String stringValue();
 
 		public boolean booleanValue();
+
+		public MyNum enumValue();
+
+		public Class<?> classValue();
+
+		public int[] arrayValue();
 	}
 
 	@TestAnnotation(byteValue = 123, charValue = 'h', shortValue = 31241, intValue = 1021341,
 			longValue = 3213123123123L, floatValue = 1.23F, doubleValue = 21348.2323D, stringValue = "hello",
-			booleanValue = true)
+			booleanValue = true, enumValue = MyNum.BAR, classValue = String.class, arrayValue = { 2, 4, 8 })
 	private static class AnnotationTest {
 		// for testing annotations only
+	}
+
+	private static enum MyNum {
+		FOO,
+		BAR,
+		BAZ,
+		// end
+		;
 	}
 }

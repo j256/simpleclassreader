@@ -6,7 +6,7 @@
 	<version>0.3-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>Simple Class Reader</name>
-	<url>https://github.com/sources/simplelogging/</url>
+	<url>https://github.com/j256/simpleclassreader</url>
 	<description>Library which allows you to read classes as bytes to get all of the metadata from it
 	without loading it.</description>
 	<licenses>

@@ -101,7 +101,7 @@ public class ConstantPool {
 	}
 
 	/**
-	 * Find a UTF8 name in the cp-info blocks
+	 * Find a UTF8 name in the cp-info entries
 	 */
 	public String findName(int index) {
 		if (index >= names.length) {
@@ -117,6 +117,9 @@ public class ConstantPool {
 		}
 	}
 
+	/**
+	 * Find a class in the cp-info entries which is an index to another name.
+	 */
 	public String findClassName(int index) {
 		if (index >= indexes.length) {
 			return null;
@@ -132,6 +135,9 @@ public class ConstantPool {
 		return findName(index);
 	}
 
+	/**
+	 * Find an object value (like int, short, etc.) in the cp-info entries.
+	 */
 	public Object findValue(int index) {
 		if (index >= values.length) {
 			return null;

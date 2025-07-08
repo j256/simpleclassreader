@@ -35,6 +35,7 @@ public class MethodInfo {
 		this.attributes = attributes;
 		this.exceptions = exceptions;
 		this.runtimeAnnotations = runtimeAnnotations;
+		// we see if the method name is the constructor constant
 		this.constructor = CONSTRUCTOR_METHOD_NAME.equals(name);
 	}
 
@@ -54,13 +55,13 @@ public class MethodInfo {
 		int index = dis.readUnsignedShort();
 		String name = constantPool.findName(index);
 		if (name == null) {
-			errors.add(ClassReaderError.INVALID_METHOD_NAME_INDEX);
+			errors.add(ClassReaderError.METHOD_NAME_INDEX_INVALID);
 			return null;
 		}
 		index = dis.readUnsignedShort();
 		String descriptorStr = constantPool.findName(index);
 		if (descriptorStr == null) {
-			errors.add(ClassReaderError.INVALID_METHOD_DESCRIPTOR_INDEX);
+			errors.add(ClassReaderError.METHOD_DESCRIPTOR_INDEX_INVALID);
 			return null;
 		}
 		MethodDescriptor methodDescriptor = null;

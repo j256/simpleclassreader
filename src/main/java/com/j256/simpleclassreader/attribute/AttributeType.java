@@ -24,7 +24,7 @@ public enum AttributeType {
 			return result;
 		}
 	},
-	CIDE("Code") {
+	CODE("Code") {
 		@Override
 		public <T> T read(DataInputStream dis, int length, ConstantPool constantPool,
 				List<ClassReaderError> parseErrors) throws IOException {
@@ -50,7 +50,16 @@ public enum AttributeType {
 			T result = (T) RuntimeVisibleAnnotationsAttribute.read(dis, constantPool, parseErrors);
 			return result;
 		}
-	}
+	},
+	SOURCE_FILE("SourceFile") {
+		@Override
+		public <T> T read(DataInputStream dis, int length, ConstantPool constantPool,
+				List<ClassReaderError> parseErrors) throws IOException {
+			@SuppressWarnings("unchecked")
+			T result = (T) SourceFileAttribute.read(dis, constantPool, parseErrors);
+			return result;
+		}
+	},
 	// end
 	;
 
