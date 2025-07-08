@@ -61,18 +61,24 @@ public class CodeAttribute {
 			exceptions[i] = ExceptionTable.read(dis, constantPool, parseErrors);
 		}
 		int attributeCount = dis.readUnsignedShort();
-		List<AttributeInfo> attributes = new ArrayList<>();
+		List<AttributeInfo> attributeInfos = new ArrayList<>();
 		for (int i = 0; i < attributeCount; i++) {
-			AttributeInfo attribute = AttributeInfo.read(dis, constantPool, parseErrors);
-			if (attribute == null) {
-				// errors already added
-			} else {
-				attributes.add(attribute);
+			AttributeInfo attributeInfo = AttributeInfo.read(dis, constantPool, parseErrors);
+			if (attributeInfo == null) {
+				// try to read other known attributes
+				continue;
 			}
+			if (attributeInfos == null) {
+				attributeInfos = new ArrayList<>();
+			}
+			attributeInfos.add(attributeInfo);
 		}
 
-		return new CodeAttribute(maxStack, maxLocals, code, exceptions,
-				attributes.toArray(new AttributeInfo[attributes.size()]));
+		AttributeInfo[] attributes = AttributeInfo.EMPTY_ARRAY;
+		if (attributeInfos != null) {
+			attributes = attributeInfos.toArray(new AttributeInfo[attributeInfos.size()]);
+		}
+		return new CodeAttribute(maxStack, maxLocals, code, exceptions, attributes);
 	}
 
 	public int getMaxStack() {

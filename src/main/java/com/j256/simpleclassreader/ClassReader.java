@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Utility class that reads in a {@link ClassInfo}.
+ * Utility class that reads in class bytes and returns a {@link ClassInfo}.
  */
 public class ClassReader {
 

@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.j256.simpleclassreader.attribute.AnnotationInfo;
 import com.j256.simpleclassreader.attribute.AttributeType;
+import com.j256.simpleclassreader.attribute.RuntimeVisibleAnnotationsAttribute;
 
 /**
  * Information about a field of a class.
@@ -16,17 +18,19 @@ public class FieldInfo {
 
 	private final int accessFlags;
 	private final String name;
-	private final DataDescriptor dataType;
+	private final DataDescriptor dataDescriptor;
 	private final AttributeInfo[] attributeInfos;
 	private final Object constantValue;
+	private final AnnotationInfo[] runtimeAnnotations;
 
-	public FieldInfo(int accessFlags, String name, DataDescriptor dataType, AttributeInfo[] attributeInfos,
-			Object constantValue) {
+	public FieldInfo(int accessFlags, String name, DataDescriptor dataDescriptor, AttributeInfo[] attributeInfos,
+			Object constantValue, AnnotationInfo[] runtimeAnnotations) {
 		this.accessFlags = accessFlags;
 		this.name = name;
-		this.dataType = dataType;
+		this.dataDescriptor = dataDescriptor;
 		this.attributeInfos = attributeInfos;
 		this.constantValue = constantValue;
+		this.runtimeAnnotations = runtimeAnnotations;
 	}
 
 	/**
@@ -51,30 +55,44 @@ public class FieldInfo {
 		index = dis.readUnsignedShort();
 		String typeStr = constantPool.findName(index);
 		if (typeStr == null) {
-			errors.add(ClassReaderError.INVALID_FIELD_DESCRIPTOR_INDEX);
+			errors.add(ClassReaderError.INVALID_FIELD_DATA_DESCRIPTOR_INDEX);
 			return null;
 		}
-		DataDescriptor dataType = null;
+		DataDescriptor dataDescriptor = null;
 		if (typeStr != null) {
-			dataType = DataDescriptor.fromString(typeStr);
+			dataDescriptor = DataDescriptor.fromString(typeStr);
+			if (dataDescriptor == null) {
+				errors.add(ClassReaderError.INVALID_FIELD_DATA_DESCRIPTOR);
+				return null;
+			}
 		}
 		int attributeCount = dis.readUnsignedShort();
 		Object constantValue = null;
-		List<AttributeInfo> attributeInfos = new ArrayList<>();
+		AnnotationInfo[] runtimeAnnotations = null;
+		List<AttributeInfo> attributeInfos = null;
 		for (int i = 0; i < attributeCount; i++) {
 			AttributeInfo attributeInfo = AttributeInfo.read(dis, constantPool, errors);
 			if (attributeInfo == null) {
-				// error already added
-			} else {
-				attributeInfos.add(attributeInfo);
-				if (attributeInfo.getType() == AttributeType.CONSTANT_VALUE) {
-					constantValue = attributeInfo.getValue();
-				}
+				// try to read other known attributes
+				continue;
 			}
+			if (attributeInfo.getType() == AttributeType.CONSTANT_VALUE) {
+				constantValue = attributeInfo.getValue();
+			}
+			if (attributeInfo.getType() == AttributeType.RUNTIME_VISIBLE_ANNOTATIONS) {
+				runtimeAnnotations = ((RuntimeVisibleAnnotationsAttribute) attributeInfo.getValue()).getAnnotations();
+			}
+			if (attributeInfos == null) {
+				attributeInfos = new ArrayList<>();
+			}
+			attributeInfos.add(attributeInfo);
 		}
 
-		return new FieldInfo(accessFlags, name, dataType,
-				attributeInfos.toArray(new AttributeInfo[attributeInfos.size()]), constantValue);
+		AttributeInfo[] attributes = AttributeInfo.EMPTY_ARRAY;
+		if (attributeInfos != null) {
+			attributes = attributeInfos.toArray(new AttributeInfo[attributeInfos.size()]);
+		}
+		return new FieldInfo(accessFlags, name, dataDescriptor, attributes, constantValue, runtimeAnnotations);
 	}
 
 	/**
@@ -157,8 +175,8 @@ public class FieldInfo {
 	/**
 	 * Returns the data-type of the field or null if it couldn't be parsed.
 	 */
-	public DataDescriptor getDataType() {
-		return dataType;
+	public DataDescriptor getDataDescriptor() {
+		return dataDescriptor;
 	}
 
 	/**
@@ -170,6 +188,10 @@ public class FieldInfo {
 
 	public Object getConstantValue() {
 		return constantValue;
+	}
+
+	public AnnotationInfo[] getRuntimeAnnotations() {
+		return runtimeAnnotations;
 	}
 
 	@Override

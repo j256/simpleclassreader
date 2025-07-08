@@ -12,6 +12,8 @@ import com.j256.simpleclassreader.DataDescriptor.MutableIndex;
  */
 public class MethodDescriptor {
 
+	static final DataDescriptor[] EMPTY_PARAMS = new DataDescriptor[0];
+
 	private final String descriptorStr;
 	private final DataDescriptor[] parameterDataDescriptors;
 	private final DataDescriptor returnDescriptor;
@@ -31,14 +33,14 @@ public class MethodDescriptor {
 	}
 
 	/**
-	 * Returns the parameter descriptors.
+	 * Returns the parsed parameter descriptors.
 	 */
 	public DataDescriptor[] getParameterDataDescriptors() {
 		return parameterDataDescriptors;
 	}
 
 	/**
-	 * Returns the return descriptor.
+	 * Returns the parsed return descriptor.
 	 */
 	public DataDescriptor getReturnDescriptor() {
 		return returnDescriptor;
@@ -54,25 +56,29 @@ public class MethodDescriptor {
 	 */
 	public static MethodDescriptor fromString(String descriptorStr) {
 
-		if (descriptorStr.length() < 3) {
-			// must at least be ()V
+		// descriptor must start with '(' and be at least be ()V
+		if (descriptorStr.charAt(0) != '(' || descriptorStr.length() < 3) {
 			return null;
 		}
-		int index = 0;
-		if (descriptorStr.charAt(index) != '(') {
-			return null;
-		}
+		// we need to track the index because we are parsing multiple data descriptors from the descriptor string
 		MutableIndex mutableIndex = new MutableIndex(1);
 
-		List<DataDescriptor> parameterDataDescriptors = new ArrayList<>();
-		while (index < descriptorStr.length() && descriptorStr.charAt(mutableIndex.getValue()) != ')') {
+		List<DataDescriptor> parameterDataDescriptors = null;
+		while (descriptorStr.charAt(mutableIndex.getValue()) != ')') {
+			if (parameterDataDescriptors == null) {
+				parameterDataDescriptors = new ArrayList<>();
+			}
 			parameterDataDescriptors.add(DataDescriptor.fromString(descriptorStr, mutableIndex));
 		}
 		// skip over the ')'
 		mutableIndex.increment(1);
 
+		DataDescriptor[] params = EMPTY_PARAMS;
+		if (parameterDataDescriptors != null) {
+			params = parameterDataDescriptors.toArray(new DataDescriptor[parameterDataDescriptors.size()]);
+		}
+
 		DataDescriptor returnDescriptor = DataDescriptor.fromString(descriptorStr, mutableIndex);
-		DataDescriptor[] params = parameterDataDescriptors.toArray(new DataDescriptor[parameterDataDescriptors.size()]);
 		return new MethodDescriptor(descriptorStr, params, returnDescriptor);
 	}
 }

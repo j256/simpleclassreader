@@ -13,6 +13,8 @@ import com.j256.simpleclassreader.attribute.AttributeType;
  */
 public class AttributeInfo {
 
+	public static final AttributeInfo[] EMPTY_ARRAY = new AttributeInfo[0];
+
 	private final String name;
 	private final AttributeType type;
 	private final Object value;

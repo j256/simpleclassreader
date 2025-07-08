@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.j256.simpleclassreader.attribute.AnnotationInfo;
 import com.j256.simpleclassreader.attribute.AttributeType;
 import com.j256.simpleclassreader.attribute.ExceptionsAttribute;
+import com.j256.simpleclassreader.attribute.RuntimeVisibleAnnotationsAttribute;
 
 /**
  * Information about a method of a class.
@@ -22,15 +24,17 @@ public class MethodInfo {
 	private final MethodDescriptor methodDescriptor;
 	private final AttributeInfo[] attributes;
 	private final String[] exceptions;
+	private final AnnotationInfo[] runtimeAnnotations;
 	private final boolean constructor;
 
 	public MethodInfo(int accessFlags, String name, MethodDescriptor methodDescriptor, AttributeInfo[] attributes,
-			String[] exceptions) {
+			String[] exceptions, AnnotationInfo[] runtimeAnnotations) {
 		this.accessFlags = accessFlags;
 		this.name = name;
 		this.methodDescriptor = methodDescriptor;
 		this.attributes = attributes;
 		this.exceptions = exceptions;
+		this.runtimeAnnotations = runtimeAnnotations;
 		this.constructor = CONSTRUCTOR_METHOD_NAME.equals(name);
 	}
 
@@ -64,21 +68,31 @@ public class MethodInfo {
 			methodDescriptor = MethodDescriptor.fromString(descriptorStr);
 		}
 		int attributeCount = dis.readUnsignedShort();
-		List<AttributeInfo> attributes = new ArrayList<>();
+		List<AttributeInfo> attributeInfos = null;
 		String[] exceptions = null;
+		AnnotationInfo[] runtimeAnnotations = null;
 		for (int i = 0; i < attributeCount; i++) {
-			AttributeInfo attribute = AttributeInfo.read(dis, constantPool, errors);
-			if (attribute == null) {
+			AttributeInfo attributeInfo = AttributeInfo.read(dis, constantPool, errors);
+			if (attributeInfo == null) {
 				continue;
 			}
-			if (attribute.getType() == AttributeType.EXCEPTIONS) {
-				exceptions = ((ExceptionsAttribute) attribute.getValue()).getExceptions();
+			if (attributeInfo.getType() == AttributeType.EXCEPTIONS) {
+				exceptions = ((ExceptionsAttribute) attributeInfo.getValue()).getExceptions();
 			}
-			attributes.add(attribute);
+			if (attributeInfo.getType() == AttributeType.RUNTIME_VISIBLE_ANNOTATIONS) {
+				runtimeAnnotations = ((RuntimeVisibleAnnotationsAttribute) attributeInfo.getValue()).getAnnotations();
+			}
+			if (attributeInfos == null) {
+				attributeInfos = new ArrayList<>();
+			}
+			attributeInfos.add(attributeInfo);
 		}
 
-		return new MethodInfo(accessFlags, name, methodDescriptor,
-				attributes.toArray(new AttributeInfo[attributes.size()]), exceptions);
+		AttributeInfo[] attributes = AttributeInfo.EMPTY_ARRAY;
+		if (attributeInfos != null) {
+			attributes = attributeInfos.toArray(new AttributeInfo[attributeInfos.size()]);
+		}
+		return new MethodInfo(accessFlags, name, methodDescriptor, attributes, exceptions, runtimeAnnotations);
 	}
 
 	/**
@@ -227,6 +241,10 @@ public class MethodInfo {
 	 */
 	public String[] getExceptions() {
 		return exceptions;
+	}
+
+	public AnnotationInfo[] getRuntimeAnnotations() {
+		return runtimeAnnotations;
 	}
 
 	@Override

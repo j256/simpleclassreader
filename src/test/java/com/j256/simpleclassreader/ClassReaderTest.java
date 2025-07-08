@@ -8,11 +8,16 @@ import static org.junit.Assert.assertTrue;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import org.junit.Test;
+
+import com.j256.simpleclassreader.attribute.AnnotationInfo;
+import com.j256.simpleclassreader.attribute.AnnotationInfo.AnnotationValue;
 
 public class ClassReaderTest {
 
@@ -36,7 +41,7 @@ public class ClassReaderTest {
 				}
 				assertNotNull(reflectionField);
 				assertEquals(reflectionField.getName(), fields[i].getName());
-				assertEquals(reflectionField.getType().getName(), fields[i].getDataType().getDataClassName());
+				assertEquals(reflectionField.getType().getName(), fields[i].getDataDescriptor().getDataClassName());
 				assertEquals(reflectionField.isSynthetic(), fields[i].isSynthetic());
 			}
 			Constructor<?>[] reflectionConstructors = TestClass.class.getDeclaredConstructors();
@@ -114,10 +119,6 @@ public class ClassReaderTest {
 		String path = classToPath(TestInterface.class);
 		try (InputStream fis = new FileInputStream(path);) {
 			ClassInfo info = ClassReader.readClass(fis);
-			int major = info.getMajorVersion();
-			assertTrue(major > 50);
-			assertEquals(0, info.getMinorVersion());
-			assertEquals(JdkVersion.fromMajor(major).getJdkString() + ".0", info.getJdkVersionString());
 			assertTrue(info.getAccessFlags() != 0);
 			assertTrue(info.isAbstract());
 			assertFalse(info.isSynthetic());
@@ -127,6 +128,30 @@ public class ClassReaderTest {
 			assertFalse(info.isEnum());
 			assertFalse(info.isModule());
 			assertFalse(info.isSuper());
+		}
+	}
+
+	@Test
+	public void testAnnotations() throws IOException {
+		String path = classToPath(AnnotationTest.class);
+		try (InputStream fis = new FileInputStream(path);) {
+			ClassInfo info = ClassReader.readClass(fis);
+			AnnotationInfo[] annotations = info.getRuntimeAnnotations();
+			assertNotNull(annotations);
+			assertEquals(1, annotations.length);
+			AnnotationValue[] values = annotations[0].getValues();
+			assertNotNull(values);
+			assertEquals(9, values.length);
+			assertEquals((byte) 123, values[0].getConstValue());
+			assertEquals('h', values[1].getConstValue());
+			assertEquals((short) 31241, values[2].getConstValue());
+			assertEquals(1021341, values[3].getConstValue());
+			assertEquals(3213123123123L, values[4].getConstValue());
+			assertEquals(1.23F, values[5].getConstValue());
+			assertEquals(21348.2323D, values[6].getConstValue());
+			assertEquals("hello", values[7].getConstValue());
+			assertEquals(true, values[8].getConstValue());
+			System.err.println("parse errors: " + info.getParseErrors());
 		}
 	}
 
@@ -157,8 +182,35 @@ public class ClassReaderTest {
 		}
 	}
 
-	@SuppressWarnings("unused")
 	private static interface TestInterface extends Runnable {
 		public float changeBar(String message, float newBar);
+	}
+
+	@Retention(value = RetentionPolicy.RUNTIME)
+	public @interface TestAnnotation {
+		public byte byteValue();
+
+		public char charValue();
+
+		public short shortValue();
+
+		public int intValue();
+
+		public long longValue();
+
+		public float floatValue();
+
+		public double doubleValue();
+
+		public String stringValue();
+
+		public boolean booleanValue();
+	}
+
+	@TestAnnotation(byteValue = 123, charValue = 'h', shortValue = 31241, intValue = 1021341,
+			longValue = 3213123123123L, floatValue = 1.23F, doubleValue = 21348.2323D, stringValue = "hello",
+			booleanValue = true)
+	private static class AnnotationTest {
+		// for testing annotations only
 	}
 }

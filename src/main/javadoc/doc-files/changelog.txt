@@ -1,3 +1,6 @@
+0.3: 07/??/2025
+	* Added partial support for runtime annotations.
+
 0.2: 07/07/2025
 	* Fixed problem with the exception attribute.  Half baked check in there. 
 	* Still fleshing out tests.

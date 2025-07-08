@@ -12,12 +12,18 @@ public enum ClassReaderError {
 	INVALID_CLASS_NAME_INDEX("class name index does not point to valid location"),
 	INVALID_INTERFACE_NAME_INDEX("interface name index does not point to valid location"),
 	INVALID_FIELD_NAME_INDEX("field name index does not point to valid location"),
-	INVALID_FIELD_DESCRIPTOR_INDEX("field descriptor index does not point to valid location"),
+	INVALID_FIELD_DATA_DESCRIPTOR_INDEX("field data descriptor index does not point to valid location"),
+	INVALID_FIELD_DATA_DESCRIPTOR("field data descriptor is invalid"),
 	INVALID_METHOD_NAME_INDEX("method name index does not point to valid location"),
 	INVALID_METHOD_DESCRIPTOR_INDEX("method descriptor index does not point to valid location"),
 	INVALID_ATTRIBUTE_NAME_INDEX("attribute name index does not point to valid location"),
 	UNKNOWN_ATTRIBUTE_NAME("attribute name is not known to the lubrary"),
 	EXCEPTION_NAME_INDEX("exception name index does not point to valid location"),
+	INVALID_ANNOTATION_TYPE_INDEX("annotation data descriptor index does not point to a valid location"),
+	INVALID_ANNOTATION_TYPE("annotation data descriptor is not valid"),
+	INVALID_ANNOTATION_ENUM_NAME_INDEX("annotation enum value name index does not point to valid location"),
+	INVALID_ANNOTATION_ENUM_CONST_INDEX("annotation enum value const index does not point to valid location"),
+	INVALID_ANNOTATION_VALUE_TAG("annotation value has unknown tag"),
 	// end
 	;
 

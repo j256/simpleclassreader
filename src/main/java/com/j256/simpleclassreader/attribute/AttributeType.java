@@ -41,6 +41,15 @@ public enum AttributeType {
 			T result = (T) ExceptionsAttribute.read(dis, constantPool, parseErrors);
 			return result;
 		}
+	},
+	RUNTIME_VISIBLE_ANNOTATIONS("RuntimeVisibleAnnotations") {
+		@Override
+		public <T> T read(DataInputStream dis, int length, ConstantPool constantPool,
+				List<ClassReaderError> parseErrors) throws IOException {
+			@SuppressWarnings("unchecked")
+			T result = (T) RuntimeVisibleAnnotationsAttribute.read(dis, constantPool, parseErrors);
+			return result;
+		}
 	}
 	// end
 	;
