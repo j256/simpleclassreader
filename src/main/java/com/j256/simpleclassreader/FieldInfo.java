@@ -105,71 +105,78 @@ public class FieldInfo {
 	/**
 	 * Returns the raw access-flags value. The {@link #isPublic()} and other methods use this access-flags data.
 	 */
-	public int getAccessFlags() {
+	public int getAccessFlagsValue() {
 		return accessFlags;
+	}
+
+	/**
+	 * Get the access-flags as an array of enums.
+	 */
+	public AccessFlag[] getAccessFlags() {
+		return AccessFlag.extractFlags(accessFlags, true, false);
 	}
 
 	/**
 	 * Returns true if declared public; may be accessed from outside its package
 	 */
 	public boolean isPublic() {
-		return AccessFlags.PUBLIC.isEnabled(accessFlags);
+		return AccessFlag.PUBLIC.isEnabled(accessFlags);
 	}
 
 	/**
 	 * Returns true if declared private; accessible only within defining class and other classes belonging to same nest
 	 */
 	public boolean isPrivate() {
-		return AccessFlags.PRIVATE.isEnabled(accessFlags);
+		return AccessFlag.PRIVATE.isEnabled(accessFlags);
 	}
 
 	/**
 	 * Returns true if declared protected; may be accessed within subclasses.
 	 */
 	public boolean isProtected() {
-		return AccessFlags.PROTECTED.isEnabled(accessFlags);
+		return AccessFlag.PROTECTED.isEnabled(accessFlags);
 	}
 
 	/**
 	 * Returns true if declared static.
 	 */
 	public boolean isStatic() {
-		return AccessFlags.STATIC.isEnabled(accessFlags);
+		return AccessFlag.STATIC.isEnabled(accessFlags);
 	}
 
 	/**
 	 * Returns true if declared final; never directly assigned to after object construction (JLS §17.5).
 	 */
 	public boolean isFinal() {
-		return AccessFlags.FINAL.isEnabled(accessFlags);
+		return AccessFlag.FINAL.isEnabled(accessFlags);
 	}
 
 	/**
 	 * Returns true if declared volatile; cannot be cached.
 	 */
 	public boolean isVolatile() {
-		return AccessFlags.VOLATILE.isEnabled(accessFlags);
+		return AccessFlag.VOLATILE.isEnabled(accessFlags);
 	}
 
 	/**
 	 * Returns true if declared transient; not written or read by a persistent object manager.
 	 */
 	public boolean isTransient() {
-		return AccessFlags.TRANSIENT.isEnabled(accessFlags);
+		return AccessFlag.TRANSIENT.isEnabled(accessFlags);
 	}
 
 	/**
 	 * Returns true if declared synthetic; not present in the source code.
 	 */
 	public boolean isSynthetic() {
-		return AccessFlags.SYNTHETIC.isEnabled(accessFlags);
+		return AccessFlag.SYNTHETIC.isEnabled(accessFlags);
 	}
 
 	/**
 	 * Returns true if declared as an element of an enum.
 	 */
 	public boolean isEnum() {
-		return AccessFlags.ENUM.isEnabled(accessFlags);
+		return AccessFlag.ENUM.isEnabled(accessFlags);
 	}
 
 	/**

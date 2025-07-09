@@ -7,6 +7,8 @@ import java.util.List;
 
 import com.j256.simpleclassreader.attribute.AnnotationInfo;
 import com.j256.simpleclassreader.attribute.AttributeType;
+import com.j256.simpleclassreader.attribute.InnerClassesAttribute;
+import com.j256.simpleclassreader.attribute.InnerClassesAttribute.InnerClassInfo;
 import com.j256.simpleclassreader.attribute.RuntimeVisibleAnnotationsAttribute;
 
 /**
@@ -32,12 +34,13 @@ public class ClassInfo {
 	private final MethodInfo[] methods;
 	private final AttributeInfo[] attributes;
 	private final AnnotationInfo[] runtimeAnnotations;
+	private final InnerClassInfo[] innerClasses;
 	private final List<ClassReaderError> parseErrors;
 
 	private ClassInfo(int minorVersion, int majorVersion, JdkVersion jdkVersion, int accessFlags, String className,
 			String superClassName, String[] interfaces, FieldInfo[] fields, MethodInfo[] constructors,
 			MethodInfo[] methods, AttributeInfo[] attributes, AnnotationInfo[] runtimeAnnotations,
-			List<ClassReaderError> parseErrors) {
+			InnerClassInfo[] innerClasses, List<ClassReaderError> parseErrors) {
 		this.minorVersion = minorVersion;
 		this.majorVersion = majorVersion;
 		this.jdkVersion = jdkVersion;
@@ -50,6 +53,7 @@ public class ClassInfo {
 		this.methods = methods;
 		this.attributes = attributes;
 		this.runtimeAnnotations = runtimeAnnotations;
+		this.innerClasses = innerClasses;
 		this.parseErrors = parseErrors;
 	}
 
@@ -100,14 +104,18 @@ public class ClassInfo {
 		MethodInfo[] methods = methodList.toArray(new MethodInfo[methodList.size()]);
 		AttributeInfo[] attributes = readAttributes(dis, constantPool, parseErrors);
 		AnnotationInfo[] runtimeAnnotations = null;
+		InnerClassInfo[] innerClasses = null;
 		for (AttributeInfo attributeInfo : attributes) {
 			if (attributeInfo.getType() == AttributeType.RUNTIME_VISIBLE_ANNOTATIONS) {
 				runtimeAnnotations = ((RuntimeVisibleAnnotationsAttribute) attributeInfo.getValue()).getAnnotations();
 			}
+			if (attributeInfo.getType() == AttributeType.INNER_CLASSES) {
+				innerClasses = ((InnerClassesAttribute) attributeInfo.getValue()).getInnerClasses();
+			}
 		}
 
 		return new ClassInfo(minorVersion, majorVersion, jdkVersion, accessFlags, className, superClassName, interfaces,
-				fields, constructors, methods, attributes, runtimeAnnotations, parseErrors);
+				fields, constructors, methods, attributes, runtimeAnnotations, innerClasses, parseErrors);
 	}
 
 	public int getMajorVersion() {
@@ -130,66 +138,73 @@ public class ClassInfo {
 	}
 
 	/**
-	 * Get the acccess-flags for the class.
+	 * Get the acccess-flags value for the class.
 	 */
-	public int getAccessFlags() {
+	public int getAccessFlagsValue() {
 		return accessFlags;
+	}
+
+	/**
+	 * Get the access-flags as an array of enums.
+	 */
+	public AccessFlag[] getAccessFlags() {
+		return AccessFlag.extractFlags(accessFlags, false, false);
 	}
 
 	/**
 	 * Declared final; no subclasses allowed.
 	 */
 	public boolean isFinal() {
-		return AccessFlags.FINAL.isEnabled(accessFlags);
+		return AccessFlag.FINAL.isEnabled(accessFlags);
 	}
 
 	/**
 	 * Treat superclass methods specially when invoked by the invoke-special instruction.
 	 */
 	public boolean isSuper() {
-		return AccessFlags.SUPER.isEnabled(accessFlags);
+		return AccessFlag.SUPER.isEnabled(accessFlags);
 	}
 
 	/**
 	 * Is an interface, not a class.
 	 */
 	public boolean isInterface() {
-		return AccessFlags.INTERFACE.isEnabled(accessFlags);
+		return AccessFlag.INTERFACE.isEnabled(accessFlags);
 	}
 
 	/**
 	 * Declared abstract; must not be instantiated.
 	 */
 	public boolean isAbstract() {
-		return AccessFlags.ABSTRACT.isEnabled(accessFlags);
+		return AccessFlag.ABSTRACT.isEnabled(accessFlags);
 	}
 
 	/**
 	 * Declared synthetic; not present in the source code.
 	 */
 	public boolean isSynthetic() {
-		return AccessFlags.SYNTHETIC.isEnabled(accessFlags);
+		return AccessFlag.SYNTHETIC.isEnabled(accessFlags);
 	}
 
 	/**
 	 * Declared as an annotation type.
 	 */
 	public boolean isAnnotation() {
-		return AccessFlags.ANNOTATION.isEnabled(accessFlags);
+		return AccessFlag.ANNOTATION.isEnabled(accessFlags);
 	}
 
 	/**
 	 * Declared as an enum type.
 	 */
 	public boolean isEnum() {
-		return AccessFlags.ENUM.isEnabled(accessFlags);
+		return AccessFlag.ENUM.isEnabled(accessFlags);
 	}
 
 	/**
 	 * Is a module, not a class or interface.
 	 */
 	public boolean isModule() {
-		return AccessFlags.MODULE.isEnabled(accessFlags);
+		return AccessFlag.MODULE.isEnabled(accessFlags);
 	}
 
 	/**
@@ -243,6 +258,10 @@ public class ClassInfo {
 
 	public AnnotationInfo[] getRuntimeAnnotations() {
 		return runtimeAnnotations;
+	}
+
+	public InnerClassInfo[] getInnerClasses() {
+		return innerClasses;
 	}
 
 	/**
