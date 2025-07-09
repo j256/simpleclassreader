@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.j256.simpleclassreader.ClassReaderError;
+import com.j256.simpleclassreader.ClassReaderErrorType;
 import com.j256.simpleclassreader.ConstantPool;
 import com.j256.simpleclassreader.DataDescriptor;
 
@@ -50,7 +51,7 @@ public class AnnotationNameValue {
 			int nameIndex = dis.readUnsignedShort();
 			typeName = constantPool.findName(nameIndex);
 			if (typeName == null) {
-				parseErrors.add(ClassReaderError.ANNOTATION_NAME_INDEX_INVALID);
+				parseErrors.add(new ClassReaderError(ClassReaderErrorType.ANNOTATION_NAME_INDEX_INVALID, nameIndex));
 			}
 		}
 
@@ -58,7 +59,7 @@ public class AnnotationNameValue {
 		int tagChar = dis.read();
 		AnnotationValueTag tag = AnnotationValueTag.fromChar(tagChar);
 		if (tag == null) {
-			parseErrors.add(ClassReaderError.ANNOTATION_VALUE_TAG_INVALID);
+			parseErrors.add(new ClassReaderError(ClassReaderErrorType.ANNOTATION_VALUE_TAG_INVALID, tagChar));
 			return null;
 		}
 
@@ -127,7 +128,7 @@ public class AnnotationNameValue {
 				int typeIndex = dis.readUnsignedShort();
 				String enumType = constantPool.findName(typeIndex);
 				if (enumType == null) {
-					parseErrors.add(ClassReaderError.ANNOTATION_ENUM_NAME_INDEX_INVALID);
+					parseErrors.add(new ClassReaderError(ClassReaderErrorType.ANNOTATION_ENUM_NAME_INDEX_INVALID, typeIndex));
 					return null;
 				}
 				DataDescriptor descriptor = DataDescriptor.fromString(enumType);
@@ -137,7 +138,7 @@ public class AnnotationNameValue {
 				nameIndex = dis.readUnsignedShort();
 				String enumConstant = constantPool.findName(nameIndex);
 				if (enumConstant == null) {
-					parseErrors.add(ClassReaderError.ANNOTATION_ENUM_CONST_INDEX_INVALID);
+					parseErrors.add(new ClassReaderError(ClassReaderErrorType.ANNOTATION_ENUM_CONST_INDEX_INVALID, nameIndex));
 					return null;
 				}
 				enumValue = new EnumAnnotationValue(enumType, enumConstant);
@@ -178,7 +179,7 @@ public class AnnotationNameValue {
 						arrayValueList.toArray(arrayValueList.toArray(new AnnotationNameValue[arrayValueList.size()]));
 				break;
 			default:
-				parseErrors.add(ClassReaderError.ANNOTATION_VALUE_TAG_INVALID);
+				parseErrors.add(new ClassReaderError(ClassReaderErrorType.ANNOTATION_VALUE_TAG_INVALID, tag));
 				return null;
 		}
 

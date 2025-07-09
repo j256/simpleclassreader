@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.j256.simpleclassreader.ClassReaderError;
+import com.j256.simpleclassreader.ClassReaderErrorType;
 import com.j256.simpleclassreader.ConstantPool;
 import com.j256.simpleclassreader.DataDescriptor;
 
@@ -40,12 +41,12 @@ public class AnnotationInfo {
 		int typeIndex = dis.readUnsignedShort();
 		String typeStr = constantPool.findName(typeIndex);
 		if (typeStr == null) {
-			parseErrors.add(ClassReaderError.ANNOTATION_TYPE_INDEX_INVALID);
+			parseErrors.add(new ClassReaderError(ClassReaderErrorType.ANNOTATION_TYPE_INDEX_INVALID, typeIndex));
 			return null;
 		}
 		DataDescriptor type = DataDescriptor.fromString(typeStr);
 		if (type == null) {
-			parseErrors.add(ClassReaderError.ANNOTATION_TYPE_INDEX_INVALID);
+			parseErrors.add(new ClassReaderError(ClassReaderErrorType.ANNOTATION_TYPE_INDEX_INVALID, typeStr));
 			return null;
 		}
 		if (type.getReferenceClassName() != null) {

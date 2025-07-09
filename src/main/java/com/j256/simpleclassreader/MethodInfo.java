@@ -19,18 +19,19 @@ public class MethodInfo {
 
 	/** name of the constructor methods in the method list (hopefully true) */
 	private static final String CONSTRUCTOR_METHOD_NAME = "<init>";
-	private final int accessFlags;
+
 	private final String name;
+	private final int accessFlags;
 	private final MethodDescriptor methodDescriptor;
 	private final AttributeInfo[] attributes;
 	private final String[] exceptions;
 	private final AnnotationInfo[] runtimeAnnotations;
 	private final boolean constructor;
 
-	public MethodInfo(int accessFlags, String name, MethodDescriptor methodDescriptor, AttributeInfo[] attributes,
+	public MethodInfo(String name, int accessFlags, MethodDescriptor methodDescriptor, AttributeInfo[] attributes,
 			String[] exceptions, AnnotationInfo[] runtimeAnnotations) {
-		this.accessFlags = accessFlags;
 		this.name = name;
+		this.accessFlags = accessFlags;
 		this.methodDescriptor = methodDescriptor;
 		this.attributes = attributes;
 		this.exceptions = exceptions;
@@ -55,13 +56,13 @@ public class MethodInfo {
 		int index = dis.readUnsignedShort();
 		String name = constantPool.findName(index);
 		if (name == null) {
-			errors.add(ClassReaderError.METHOD_NAME_INDEX_INVALID);
+			errors.add(new ClassReaderError(ClassReaderErrorType.METHOD_NAME_INDEX_INVALID, index));
 			return null;
 		}
 		index = dis.readUnsignedShort();
 		String descriptorStr = constantPool.findName(index);
 		if (descriptorStr == null) {
-			errors.add(ClassReaderError.METHOD_DESCRIPTOR_INDEX_INVALID);
+			errors.add(new ClassReaderError(ClassReaderErrorType.METHOD_DESCRIPTOR_INDEX_INVALID, index));
 			return null;
 		}
 		MethodDescriptor methodDescriptor = null;
@@ -93,11 +94,18 @@ public class MethodInfo {
 		if (attributeInfos != null) {
 			attributes = attributeInfos.toArray(new AttributeInfo[attributeInfos.size()]);
 		}
-		return new MethodInfo(accessFlags, name, methodDescriptor, attributes, exceptions, runtimeAnnotations);
+		return new MethodInfo(name, accessFlags, methodDescriptor, attributes, exceptions, runtimeAnnotations);
 	}
 
 	/**
-	 * Returns the access-flags for the method.
+	 * Returns the name of the method. Constructors will have the name of "<init>"
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * Returns the access-flags for the method. The {@link #isPublic()} and other methods use this access-flags data.
 	 */
 	public int getAccessFlags() {
 		return accessFlags;
@@ -188,13 +196,6 @@ public class MethodInfo {
 	}
 
 	/**
-	 * Returns the name of the method. Constructors will have the name of "<init>"
-	 */
-	public String getName() {
-		return name;
-	}
-
-	/**
 	 * Returns true if this method has the constructor name of "<init>"
 	 */
 	public boolean isConstructor() {
@@ -244,6 +245,9 @@ public class MethodInfo {
 		return exceptions;
 	}
 
+	/**
+	 * Return any runtime annotations on this method.
+	 */
 	public AnnotationInfo[] getRuntimeAnnotations() {
 		return runtimeAnnotations;
 	}

@@ -11,19 +11,24 @@ import java.io.IOException;
  */
 public class Utils {
 
-	private static final int BUFFER_SIZE = 8192;
+	private static final int BUFFER_SIZE = 16384;
 
 	/**
-	 * Return a byte[] with the length bytes from the input-stream. We jump through these hoops because we are worried
-	 * that length is invalid and we want to hit the EOF before we do the new byte[length] and possibly allocate a huge
-	 * buffer unnecessarily.
+	 * Return a byte[] with the length bytes from the input-stream.
 	 */
 	public static byte[] readLength(DataInputStream dis, int length) throws IOException {
+		// shortcut if the length is small, no reason to pay for the reallocs
 		if (length <= BUFFER_SIZE) {
 			byte[] bytes = new byte[length];
 			dis.readFully(bytes);
 			return bytes;
 		}
+
+		/*
+		 * We jump through these hoops because we are worried that length is invalid and we want to hit the EOF before
+		 * we do the new byte[length] and possibly allocate a huge buffer unnecessarily. This will cause us to realloc a
+		 * bunch if the byte[] is large.
+		 */
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		byte[] buffer = new byte[BUFFER_SIZE];
 		while (length > 0) {

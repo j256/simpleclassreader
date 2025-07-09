@@ -5,36 +5,40 @@ package com.j256.simpleclassreader;
  * 
  * @author graywatson
  */
-public enum ClassReaderError {
-	MAGIC_INVALID("magic numbner at the start of the class doesn't match 0xCAFEBABE, maybe not a class"),
-	UNKNOWN_MAJOR_VERSION("unknown major version numnber"),
-	CONSTANT_POOL_INFO_INVALID("invalid constant-pool class struction type"),
-	CLASS_NAME_INDEX_INVALID("class name index does not point to valid location"),
-	INTERFACE_NAME_INDEX_INVALID("interface name index does not point to valid location"),
-	FIELD_NAME_INDEX_INVALID("field name index does not point to valid location"),
-	FIELD_DATA_DESCRIPTOR_INDEX_INVALID("field data descriptor index does not point to valid location"),
-	FIELD_DATA_DESCRIPTOR_INVALID("field data descriptor is invalid"),
-	METHOD_NAME_INDEX_INVALID("method name index does not point to valid location"),
-	METHOD_DESCRIPTOR_INDEX_INVALID("method descriptor index does not point to valid location"),
-	ATTRIBUTE_NAME_INDEX_INVALID("attribute name index does not point to valid location"),
-	ATTRIBUTE_NAME_UNKNOWN("attribute name is not known to the lubrary"),
-	EXCEPTION_NAME_INDEX_INVALID("exception name index does not point to valid location"),
-	ANNOTATION_NAME_INDEX_INVALID("annotation name index does not point to valid location"),
-	ANNOTATION_TYPE_INDEX_INVALID("annotation data descriptor index does not point to a valid location"),
-	ANNOTATION_TYPE_INVALID("annotation data descriptor is not valid"),
-	ANNOTATION_ENUM_NAME_INDEX_INVALID("annotation enum value name index does not point to valid location"),
-	ANNOTATION_ENUM_CONST_INDEX_INVALID("annotation enum value const index does not point to valid location"),
-	ANNOTATION_VALUE_TAG_INVALID("annotation value has unknown tag"),
-	// end
-	;
+public class ClassReaderError {
 
-	private final String message;
+	private final ClassReaderErrorType type;
+	private final String details;
 
-	private ClassReaderError(String message) {
-		this.message = message;
+	public ClassReaderError(ClassReaderErrorType type, String details) {
+		this.type = type;
+		this.details = details;
 	}
 
-	public String getMessage() {
-		return message;
+	public ClassReaderError(ClassReaderErrorType type, Object details) {
+		this.type = type;
+		if (details == null) {
+			this.details = null;
+		} else {
+			this.details = String.valueOf(details);
+		}
+	}
+
+	public ClassReaderErrorType getType() {
+		return type;
+	}
+
+	public String getDetails() {
+		return details;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(type);
+		if (details != null) {
+			sb.append(": ").append(details);
+		}
+		return sb.toString();
 	}
 }

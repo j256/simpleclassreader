@@ -10,7 +10,8 @@ import com.j256.simpleclassreader.attribute.AttributeType;
 import com.j256.simpleclassreader.attribute.RuntimeVisibleAnnotationsAttribute;
 
 /**
- * The metadata and other information about a class.
+ * The metadata about a class including name, super-class, version, access details, interfaces, fields, constructors,
+ * methods, annotations, and attributes.
  * 
  * Based on: https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-4.html
  */
@@ -60,20 +61,20 @@ public class ClassInfo {
 		List<ClassReaderError> parseErrors = new ArrayList<>();
 		int magic = dis.readInt();
 		if (magic != CLASS_MAGIC) {
-			parseErrors.add(ClassReaderError.MAGIC_INVALID);
+			parseErrors.add(new ClassReaderError(ClassReaderErrorType.MAGIC_INVALID, magic));
 			return null;
 		}
 		int minorVersion = dis.readUnsignedShort();
 		int majorVersion = dis.readUnsignedShort();
 		JdkVersion jdkVersion = JdkVersion.fromMajor(majorVersion);
 		if (jdkVersion == null) {
-			parseErrors.add(ClassReaderError.UNKNOWN_MAJOR_VERSION);
+			parseErrors.add(new ClassReaderError(ClassReaderErrorType.UNKNOWN_MAJOR_VERSION, majorVersion));
 			// try to continue
 		}
 
 		ConstantPool constantPool = ConstantPool.read(dis);
 		if (constantPool == null) {
-			parseErrors.add(ClassReaderError.CONSTANT_POOL_INFO_INVALID);
+			parseErrors.add(new ClassReaderError(ClassReaderErrorType.CONSTANT_POOL_INFO_INVALID, null));
 			return null;
 		}
 
@@ -256,7 +257,7 @@ public class ClassInfo {
 		int index = dis.readUnsignedShort();
 		String name = constantPool.findClassName(index);
 		if (name == null) {
-			parseErrors.add(ClassReaderError.CLASS_NAME_INDEX_INVALID);
+			parseErrors.add(new ClassReaderError(ClassReaderErrorType.CLASS_NAME_INDEX_INVALID, index));
 			return null;
 		}
 		name = Utils.classPathToPackage(name);
@@ -271,7 +272,7 @@ public class ClassInfo {
 			int index = dis.readUnsignedShort();
 			String name = constantPool.findClassName(index);
 			if (name == null) {
-				parseErrors.add(ClassReaderError.INTERFACE_NAME_INDEX_INVALID);
+				parseErrors.add(new ClassReaderError(ClassReaderErrorType.INTERFACE_NAME_INDEX_INVALID, index));
 				// try to continue
 			} else {
 				name = Utils.classPathToPackage(name);

@@ -17,9 +17,10 @@ public class ClassReader {
 	 * @param classBytes
 	 *            Array of bytes that contains the class.
 	 * @throws EOFException
-	 *             If the end of the buffer was reached prematurely.
+	 *             If the end of the buffer was reached prematurely. This probably indicates truncated or corrupted
+	 *             class information.
 	 * @throws IOException
-	 *             General input error..
+	 *             General input problem..
 	 */
 	public static ClassInfo readClass(byte[] classBytes) throws EOFException, IOException {
 		return readClass(new ByteArrayInputStream(classBytes));
@@ -31,13 +32,14 @@ public class ClassReader {
 	 * @param classBytes
 	 *            Array of bytes that contains the class.
 	 * @param offset
-	 *            Start of the bytes of the class.
+	 *            Start of the bytes of the class in the buffer.
 	 * @param length
-	 *            Length of the class bytes to read.
+	 *            Length of the class bytes to read from the buffer.
 	 * @throws EOFException
-	 *             If the end of the buffer was reached prematurely.
+	 *             If the end of the buffer was reached prematurely. This probably indicates truncated or corrupted
+	 *             class information.
 	 * @throws IOException
-	 *             General input error..
+	 *             General input problem..
 	 */
 	public static ClassInfo readClass(byte[] classBytes, int offset, int length) throws EOFException, IOException {
 		return readClass(new ByteArrayInputStream(classBytes, offset, length));
@@ -46,35 +48,17 @@ public class ClassReader {
 	/**
 	 * Read in a {@link ClassInfo} using the input-stream which will _not_ be closed.
 	 * 
+	 * @param inputStream
+	 *            Input stream to read the class bytes from. The stream should be closed by the caller.
 	 * @throws EOFException
-	 *             If the end of the buffer was reached prematurely.
+	 *             If the end of the input was reached prematurely. This probably indicates truncated or corrupted class
+	 *             information.
 	 * @throws IOException
-	 *             General input error..
+	 *             General input problem..
 	 */
 	public static ClassInfo readClass(InputStream inputStream) throws EOFException, IOException {
-		try (DataInputStream dis = new DataInputStream(inputStream);) {
-			return ClassInfo.read(dis);
-		}
-	}
-
-	/**
-	 * Enum which allows the caller to limit the reader to the parts of the class that you actually care about. It can
-	 * speed up some of the processing and maybe some of the I/O. If you only care about the class attributes, you will
-	 * need to read the fields and methods because they are ahead of the attributes on disk but the various data
-	 * elements will not be created.
-	 */
-	public static enum ClassParts {
-		/** load in the field information */
-		FIELDS,
-		/** load in the method information */
-		METHODS,
-		/** pay attention to the class level attributes */
-		CLASS_ATTRIBUTES,
-		/** pay attention to the field level attributes */
-		FIELD_ATTRIBUTES,
-		/** pay attention to the method level attributes */
-		METHOD_ATTRIBUTES,
-		// end
-		;
+		DataInputStream dis = new DataInputStream(inputStream);
+		return ClassInfo.read(dis);
+		// NOTE: dis is not closed on purpose because that would close the underlying input-stream
 	}
 }

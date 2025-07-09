@@ -10,23 +10,23 @@ import com.j256.simpleclassreader.attribute.AttributeType;
 import com.j256.simpleclassreader.attribute.RuntimeVisibleAnnotationsAttribute;
 
 /**
- * Information about a field of a class.
+ * Information about a field of a class including name, access details, data type, annotations, and attributes.
  * 
  * @author graywatson
  */
 public class FieldInfo {
 
-	private final int accessFlags;
 	private final String name;
+	private final int accessFlags;
 	private final DataDescriptor dataDescriptor;
 	private final AttributeInfo[] attributeInfos;
 	private final Object constantValue;
 	private final AnnotationInfo[] runtimeAnnotations;
 
-	public FieldInfo(int accessFlags, String name, DataDescriptor dataDescriptor, AttributeInfo[] attributeInfos,
+	public FieldInfo(String name, int accessFlags, DataDescriptor dataDescriptor, AttributeInfo[] attributeInfos,
 			Object constantValue, AnnotationInfo[] runtimeAnnotations) {
-		this.accessFlags = accessFlags;
 		this.name = name;
+		this.accessFlags = accessFlags;
 		this.dataDescriptor = dataDescriptor;
 		this.attributeInfos = attributeInfos;
 		this.constantValue = constantValue;
@@ -49,20 +49,20 @@ public class FieldInfo {
 		int index = dis.readUnsignedShort();
 		String name = constantPool.findName(index);
 		if (name == null) {
-			errors.add(ClassReaderError.FIELD_NAME_INDEX_INVALID);
+			errors.add(new ClassReaderError(ClassReaderErrorType.FIELD_NAME_INDEX_INVALID, index));
 			return null;
 		}
 		index = dis.readUnsignedShort();
 		String typeStr = constantPool.findName(index);
 		if (typeStr == null) {
-			errors.add(ClassReaderError.FIELD_DATA_DESCRIPTOR_INDEX_INVALID);
+			errors.add(new ClassReaderError(ClassReaderErrorType.FIELD_DATA_DESCRIPTOR_INDEX_INVALID, index));
 			return null;
 		}
 		DataDescriptor dataDescriptor = null;
 		if (typeStr != null) {
 			dataDescriptor = DataDescriptor.fromString(typeStr);
 			if (dataDescriptor == null) {
-				errors.add(ClassReaderError.FIELD_DATA_DESCRIPTOR_INVALID);
+				errors.add(new ClassReaderError(ClassReaderErrorType.FIELD_DATA_DESCRIPTOR_INVALID, typeStr));
 				return null;
 			}
 		}
@@ -92,7 +92,7 @@ public class FieldInfo {
 		if (attributeInfos != null) {
 			attributes = attributeInfos.toArray(new AttributeInfo[attributeInfos.size()]);
 		}
-		return new FieldInfo(accessFlags, name, dataDescriptor, attributes, constantValue, runtimeAnnotations);
+		return new FieldInfo(name, accessFlags, dataDescriptor, attributes, constantValue, runtimeAnnotations);
 	}
 
 	/**
@@ -103,7 +103,7 @@ public class FieldInfo {
 	}
 
 	/**
-	 * Returns access-flags value.
+	 * Returns the raw access-flags value. The {@link #isPublic()} and other methods use this access-flags data.
 	 */
 	public int getAccessFlags() {
 		return accessFlags;
