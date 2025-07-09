@@ -113,63 +113,63 @@ public class FieldInfo {
 	 * Returns true if declared public; may be accessed from outside its package
 	 */
 	public boolean isPublic() {
-		return FieldAccessInfo.PUBLIC.isEnabled(accessFlags);
+		return AccessFlags.PUBLIC.isEnabled(accessFlags);
 	}
 
 	/**
 	 * Returns true if declared private; accessible only within defining class and other classes belonging to same nest
 	 */
 	public boolean isPrivate() {
-		return FieldAccessInfo.PRIVATE.isEnabled(accessFlags);
+		return AccessFlags.PRIVATE.isEnabled(accessFlags);
 	}
 
 	/**
 	 * Returns true if declared protected; may be accessed within subclasses.
 	 */
 	public boolean isProtected() {
-		return FieldAccessInfo.PROTECTED.isEnabled(accessFlags);
+		return AccessFlags.PROTECTED.isEnabled(accessFlags);
 	}
 
 	/**
 	 * Returns true if declared static.
 	 */
 	public boolean isStatic() {
-		return FieldAccessInfo.STATIC.isEnabled(accessFlags);
+		return AccessFlags.STATIC.isEnabled(accessFlags);
 	}
 
 	/**
 	 * Returns true if declared final; never directly assigned to after object construction (JLS §17.5).
 	 */
 	public boolean isFinal() {
-		return FieldAccessInfo.FINAL.isEnabled(accessFlags);
+		return AccessFlags.FINAL.isEnabled(accessFlags);
 	}
 
 	/**
 	 * Returns true if declared volatile; cannot be cached.
 	 */
 	public boolean isVolatile() {
-		return FieldAccessInfo.VOLATILE.isEnabled(accessFlags);
+		return AccessFlags.VOLATILE.isEnabled(accessFlags);
 	}
 
 	/**
 	 * Returns true if declared transient; not written or read by a persistent object manager.
 	 */
 	public boolean isTransient() {
-		return FieldAccessInfo.TRANSIENT.isEnabled(accessFlags);
+		return AccessFlags.TRANSIENT.isEnabled(accessFlags);
 	}
 
 	/**
 	 * Returns true if declared synthetic; not present in the source code.
 	 */
 	public boolean isSynthetic() {
-		return FieldAccessInfo.SYNTHETIC.isEnabled(accessFlags);
+		return AccessFlags.SYNTHETIC.isEnabled(accessFlags);
 	}
 
 	/**
 	 * Returns true if declared as an element of an enum.
 	 */
 	public boolean isEnum() {
-		return FieldAccessInfo.ENUM.isEnabled(accessFlags);
+		return AccessFlags.ENUM.isEnabled(accessFlags);
 	}
 
 	/**
@@ -197,44 +197,5 @@ public class FieldInfo {
 	@Override
 	public String toString() {
 		return "field " + name;
-	}
-
-	/**
-	 * Access information associated with a field from the access-flags.
-	 */
-	private static enum FieldAccessInfo {
-		/** Declared public; may be accessed from outside its package */
-		PUBLIC(0x0001),
-		/** Declared private; accessible only within defining class and other classes belonging to same nest */
-		PRIVATE(0x0002),
-		/** Declared protected; may be accessed within subclasses. */
-		PROTECTED(0x0004),
-		/** Declared static. */
-		STATIC(0x0008),
-		/** Declared final; never directly assigned to after object construction (JLS §17.5). */
-		FINAL(0x0010),
-		/** Declared volatile; cannot be cached. */
-		VOLATILE(0x0040),
-		/** Declared transient; not written or read by a persistent object manager. */
-		TRANSIENT(0x0080),
-		/** Declared synthetic; not present in the source code. */
-		SYNTHETIC(0x1000),
-		/** Declared as an element of an enum. */
-		ENUM(0x4000),
-		// end
-		;
-
-		private final int bit;
-
-		private FieldAccessInfo(int bit) {
-			this.bit = bit;
-		}
-
-		/**
-		 * Return true if the access-flags have this access-info bit set.
-		 */
-		public boolean isEnabled(int accessFlags) {
-			return ((accessFlags & bit) != 0);
-		}
 	}
 }
