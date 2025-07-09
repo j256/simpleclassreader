@@ -200,14 +200,23 @@ public class FieldInfo {
 		return attributeInfos;
 	}
 
+	/**
+	 * Get the value of the constant-value attribute.
+	 */
 	public Object getConstantValue() {
 		return constantValue;
 	}
 
+	/**
+	 * Get the runtime annotations of the field.
+	 */
 	public AnnotationInfo[] getRuntimeAnnotations() {
 		return runtimeAnnotations;
 	}
 
+	/**
+	 * Is the field marked with the Deprecated attribute.
+	 */
 	public boolean isDeprecated() {
 		return deprecated;
 	}

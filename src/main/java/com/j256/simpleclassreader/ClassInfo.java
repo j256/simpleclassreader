@@ -165,13 +165,6 @@ public class ClassInfo {
 	}
 
 	/**
-	 * Treat superclass methods specially when invoked by the invoke-special instruction.
-	 */
-	public boolean isSuper() {
-		return AccessFlag.SUPER.isEnabled(accessFlags);
-	}
-
-	/**
 	 * Is an interface, not a class.
 	 */
 	public boolean isInterface() {
@@ -273,6 +266,9 @@ public class ClassInfo {
 		return innerClasses;
 	}
 
+	/**
+	 * Is the class marked with the Deprecated attribute.
+	 */
 	public boolean isDeprecated() {
 		return deprecated;
 	}

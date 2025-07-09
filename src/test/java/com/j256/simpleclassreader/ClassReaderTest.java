@@ -94,8 +94,6 @@ public class ClassReaderTest {
 			assertFalse(info.isInterface());
 			assertFalse(info.isEnum());
 			assertFalse(info.isModule());
-			// XXX: why?
-			assertTrue(info.isSuper());
 			InnerClassInfo[] innerClasses = info.getInnerClasses();
 			assertNotNull(innerClasses);
 			assertEquals(2, innerClasses.length);
@@ -143,7 +141,6 @@ public class ClassReaderTest {
 			assertTrue(info.isInterface());
 			assertFalse(info.isEnum());
 			assertFalse(info.isModule());
-			assertFalse(info.isSuper());
 			InnerClassInfo[] innerClasses = info.getInnerClasses();
 			assertNotNull(innerClasses);
 			assertEquals(1, innerClasses.length);

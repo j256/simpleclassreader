@@ -266,6 +266,9 @@ public class MethodInfo {
 		return runtimeAnnotations;
 	}
 
+	/**
+	 * Is the method marked with the Deprecated attribute.
+	 */
 	public boolean isDeprecated() {
 		return deprecated;
 	}
