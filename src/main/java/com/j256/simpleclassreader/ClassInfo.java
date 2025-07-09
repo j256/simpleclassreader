@@ -35,12 +35,13 @@ public class ClassInfo {
 	private final AttributeInfo[] attributes;
 	private final AnnotationInfo[] runtimeAnnotations;
 	private final InnerClassInfo[] innerClasses;
+	private final boolean deprecated;
 	private final List<ClassReaderError> parseErrors;
 
 	private ClassInfo(int minorVersion, int majorVersion, JdkVersion jdkVersion, int accessFlags, String className,
 			String superClassName, String[] interfaces, FieldInfo[] fields, MethodInfo[] constructors,
 			MethodInfo[] methods, AttributeInfo[] attributes, AnnotationInfo[] runtimeAnnotations,
-			InnerClassInfo[] innerClasses, List<ClassReaderError> parseErrors) {
+			InnerClassInfo[] innerClasses, boolean deprecated, List<ClassReaderError> parseErrors) {
 		this.minorVersion = minorVersion;
 		this.majorVersion = majorVersion;
 		this.jdkVersion = jdkVersion;
@@ -54,6 +55,7 @@ public class ClassInfo {
 		this.attributes = attributes;
 		this.runtimeAnnotations = runtimeAnnotations;
 		this.innerClasses = innerClasses;
+		this.deprecated = deprecated;
 		this.parseErrors = parseErrors;
 	}
 
@@ -105,6 +107,7 @@ public class ClassInfo {
 		AttributeInfo[] attributes = readAttributes(dis, constantPool, parseErrors);
 		AnnotationInfo[] runtimeAnnotations = null;
 		InnerClassInfo[] innerClasses = null;
+		boolean deprecated = false;
 		for (AttributeInfo attributeInfo : attributes) {
 			if (attributeInfo.getType() == AttributeType.RUNTIME_VISIBLE_ANNOTATIONS) {
 				runtimeAnnotations = ((RuntimeVisibleAnnotationsAttribute) attributeInfo.getValue()).getAnnotations();
@@ -112,10 +115,13 @@ public class ClassInfo {
 			if (attributeInfo.getType() == AttributeType.INNER_CLASSES) {
 				innerClasses = ((InnerClassesAttribute) attributeInfo.getValue()).getInnerClasses();
 			}
+			if (attributeInfo.getType() == AttributeType.DEPRECATED) {
+				deprecated = true;
+			}
 		}
 
 		return new ClassInfo(minorVersion, majorVersion, jdkVersion, accessFlags, className, superClassName, interfaces,
-				fields, constructors, methods, attributes, runtimeAnnotations, innerClasses, parseErrors);
+				fields, constructors, methods, attributes, runtimeAnnotations, innerClasses, deprecated, parseErrors);
 	}
 
 	public int getMajorVersion() {
@@ -260,8 +266,15 @@ public class ClassInfo {
 		return runtimeAnnotations;
 	}
 
+	/**
+	 * Return the inner classes and referenced classes from the class.
+	 */
 	public InnerClassInfo[] getInnerClasses() {
 		return innerClasses;
+	}
+
+	public boolean isDeprecated() {
+		return deprecated;
 	}
 
 	/**

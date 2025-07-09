@@ -33,6 +33,14 @@ public enum AttributeType {
 			return result;
 		}
 	},
+	DEPRECATED("Deprecated") {
+		@Override
+		public <T> T read(DataInputStream dis, int length, ConstantPool constantPool,
+				List<ClassReaderError> parseErrors) {
+			// there is no additional information in this attribute so no need to have a type
+			return null;
+		}
+	},
 	EXCEPTIONS("Exceptions") {
 		@Override
 		public <T> T read(DataInputStream dis, int length, ConstantPool constantPool,

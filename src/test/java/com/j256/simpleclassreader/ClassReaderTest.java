@@ -27,12 +27,12 @@ public class ClassReaderTest {
 	public void testStuff() throws IOException {
 		String path = classToPath(TestClass.class);
 		try (InputStream fis = new FileInputStream(path);) {
-			ClassInfo classInfo = ClassReader.readClass(fis);
-			assertNotNull(classInfo);
-			assertEquals(TestClass.class.getName(), classInfo.getClassName());
-			assertEquals(Object.class.getName(), classInfo.getSuperClassName());
+			ClassInfo info = ClassReader.readClass(fis);
+			assertNotNull(info);
+			assertEquals(TestClass.class.getName(), info.getClassName());
+			assertEquals(Object.class.getName(), info.getSuperClassName());
 			Field[] reflectionFields = TestClass.class.getDeclaredFields();
-			FieldInfo[] fields = classInfo.getFields();
+			FieldInfo[] fields = info.getFields();
 			// NOTE: there might be artificial fields when running with coverage data
 			for (int i = 0; i < fields.length; i++) {
 				Field reflectionField = null;
@@ -47,11 +47,11 @@ public class ClassReaderTest {
 				assertEquals(reflectionField.isSynthetic(), fields[i].isSynthetic());
 			}
 			Constructor<?>[] reflectionConstructors = TestClass.class.getDeclaredConstructors();
-			MethodInfo[] constructors = classInfo.getConstructors();
+			MethodInfo[] constructors = info.getConstructors();
 			assertEquals(reflectionConstructors.length, constructors.length);
 			// reflection shows the constructor as the type name
 			Method[] reflectionMethods = TestClass.class.getDeclaredMethods();
-			MethodInfo[] methods = classInfo.getMethods();
+			MethodInfo[] methods = info.getMethods();
 			// NOTE: there might be artificial methods when running with coverage data
 			for (int i = 0; i < methods.length; i++) {
 				Method reflectionMethod = null;
@@ -67,7 +67,13 @@ public class ClassReaderTest {
 				assertEquals(reflectionMethod.isBridge(), methods[i].isBridge());
 				assertEquals(reflectionMethod.isVarArgs(), methods[i].isVarargs());
 				assertEquals(reflectionMethod.isSynthetic(), methods[i].isSynthetic());
+				if ("changeBar".equals(methods[i].getName())) {
+					assertTrue(methods[i].isDeprecated());
+				} else {
+					assertFalse(methods[i].isDeprecated());
+				}
 			}
+			System.err.println("parse errors: " + info.getParseErrors());
 		}
 	}
 
@@ -90,9 +96,16 @@ public class ClassReaderTest {
 			assertFalse(info.isModule());
 			// XXX: why?
 			assertTrue(info.isSuper());
+			InnerClassInfo[] innerClasses = info.getInnerClasses();
+			assertNotNull(innerClasses);
+			assertEquals(2, innerClasses.length);
+			for (int i = 0; i < innerClasses.length; i++) {
+				System.out.println(i + ": " + innerClasses[i]);
+			}
 			String[] interfaces = info.getInterfaces();
 			assertEquals(1, interfaces.length);
 			assertEquals(Runnable.class.getName(), interfaces[0]);
+			System.err.println("parse errors: " + info.getParseErrors());
 		}
 	}
 
@@ -113,6 +126,7 @@ public class ClassReaderTest {
 				}
 			}
 			assertTrue(found);
+			System.err.println("parse errors: " + info.getParseErrors());
 		}
 	}
 
@@ -130,6 +144,13 @@ public class ClassReaderTest {
 			assertFalse(info.isEnum());
 			assertFalse(info.isModule());
 			assertFalse(info.isSuper());
+			InnerClassInfo[] innerClasses = info.getInnerClasses();
+			assertNotNull(innerClasses);
+			assertEquals(1, innerClasses.length);
+			for (int i = 0; i < innerClasses.length; i++) {
+				System.out.println("interface " + i + ": " + innerClasses[i]);
+			}
+			System.err.println("parse errors: " + info.getParseErrors());
 		}
 	}
 
@@ -197,6 +218,10 @@ public class ClassReaderTest {
 		@Override
 		public void run() {
 			// do thread stuff
+		}
+
+		public static class Inner {
+			// empty
 		}
 	}
 

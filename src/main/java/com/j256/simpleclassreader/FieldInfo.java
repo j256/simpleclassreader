@@ -22,15 +22,17 @@ public class FieldInfo {
 	private final AttributeInfo[] attributeInfos;
 	private final Object constantValue;
 	private final AnnotationInfo[] runtimeAnnotations;
+	private final boolean deprecated;
 
 	public FieldInfo(String name, int accessFlags, DataDescriptor dataDescriptor, AttributeInfo[] attributeInfos,
-			Object constantValue, AnnotationInfo[] runtimeAnnotations) {
+			Object constantValue, AnnotationInfo[] runtimeAnnotations, boolean deprecated) {
 		this.name = name;
 		this.accessFlags = accessFlags;
 		this.dataDescriptor = dataDescriptor;
 		this.attributeInfos = attributeInfos;
 		this.constantValue = constantValue;
 		this.runtimeAnnotations = runtimeAnnotations;
+		this.deprecated = deprecated;
 	}
 
 	/**
@@ -70,6 +72,7 @@ public class FieldInfo {
 		Object constantValue = null;
 		AnnotationInfo[] runtimeAnnotations = null;
 		List<AttributeInfo> attributeInfos = null;
+		boolean deprecated = false;
 		for (int i = 0; i < attributeCount; i++) {
 			AttributeInfo attributeInfo = AttributeInfo.read(dis, constantPool, errors);
 			if (attributeInfo == null) {
@@ -82,6 +85,9 @@ public class FieldInfo {
 			if (attributeInfo.getType() == AttributeType.RUNTIME_VISIBLE_ANNOTATIONS) {
 				runtimeAnnotations = ((RuntimeVisibleAnnotationsAttribute) attributeInfo.getValue()).getAnnotations();
 			}
+			if (attributeInfo.getType() == AttributeType.DEPRECATED) {
+				deprecated = true;
+			}
 			if (attributeInfos == null) {
 				attributeInfos = new ArrayList<>();
 			}
@@ -92,7 +98,8 @@ public class FieldInfo {
 		if (attributeInfos != null) {
 			attributes = attributeInfos.toArray(new AttributeInfo[attributeInfos.size()]);
 		}
-		return new FieldInfo(name, accessFlags, dataDescriptor, attributes, constantValue, runtimeAnnotations);
+		return new FieldInfo(name, accessFlags, dataDescriptor, attributes, constantValue, runtimeAnnotations,
+				deprecated);
 	}
 
 	/**
@@ -199,6 +206,10 @@ public class FieldInfo {
 
 	public AnnotationInfo[] getRuntimeAnnotations() {
 		return runtimeAnnotations;
+	}
+
+	public boolean isDeprecated() {
+		return deprecated;
 	}
 
 	@Override
