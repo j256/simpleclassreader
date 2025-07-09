@@ -3,8 +3,6 @@ package com.j256.simpleclassreader;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Internal class "constant pool" which stores the strings and other data items used by the various other parts of the
@@ -193,56 +191,6 @@ public class ConstantPool {
 		int bootstrapMethodAttrIndex = dis.readUnsignedShort();
 		int nameAndTypeIndex = dis.readUnsignedShort();
 		return new DoubleInt(bootstrapMethodAttrIndex, nameAndTypeIndex);
-	}
-
-	/**
-	 * Access information about the class from the access-flags.
-	 */
-	public static enum ClassAccessInfo {
-		/** Declared final; no subclasses allowed. */
-		FINAL(0x0010),
-		/** Treat superclass methods specially when invoked by the invoke-special instruction. */
-		SUPER(0x0020),
-		/** Is an interface, not a class. */
-		INTERFACE(0x0200),
-		/** Declared abstract; must not be instantiated. */
-		ABSTRACT(0x0400),
-		/** Declared synthetic; not present in the source code. */
-		SYNTHETIC(0x1000),
-		/** Declared as an annotation type. */
-		ANNOTATION(0x2000),
-		/** Declared as an enum type. */
-		ENUM(0x4000),
-		/** Is a module, not a class or interface. */
-		MODULE(0x8000),
-		// end
-		;
-
-		private final int bit;
-
-		private ClassAccessInfo(int bit) {
-			this.bit = bit;
-		}
-
-		/**
-		 * Get the access info array from the access flags.
-		 */
-		public static ClassAccessInfo[] fromAccessFlags(int accessFlags) {
-			List<ClassAccessInfo> accessInfos = new ArrayList<>();
-			for (ClassAccessInfo info : values()) {
-				if ((info.bit & accessFlags) != 0) {
-					accessInfos.add(info);
-				}
-			}
-			return accessInfos.toArray(new ClassAccessInfo[accessInfos.size()]);
-		}
-
-		/**
-		 * Return true if the access-flags have this access-info bit set.
-		 */
-		public boolean isEnabled(int accessFlags) {
-			return ((accessFlags & bit) != 0);
-		}
 	}
 
 	/**

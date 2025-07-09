@@ -140,56 +140,56 @@ public class ClassInfo {
 	 * Declared final; no subclasses allowed.
 	 */
 	public boolean isFinal() {
-		return ClassAccessInfo.FINAL.isEnabled(accessFlags);
+		return AccessFlags.FINAL.isEnabled(accessFlags);
 	}
 
 	/**
 	 * Treat superclass methods specially when invoked by the invoke-special instruction.
 	 */
 	public boolean isSuper() {
-		return ClassAccessInfo.SUPER.isEnabled(accessFlags);
+		return AccessFlags.SUPER.isEnabled(accessFlags);
 	}
 
 	/**
 	 * Is an interface, not a class.
 	 */
 	public boolean isInterface() {
-		return ClassAccessInfo.INTERFACE.isEnabled(accessFlags);
+		return AccessFlags.INTERFACE.isEnabled(accessFlags);
 	}
 
 	/**
 	 * Declared abstract; must not be instantiated.
 	 */
 	public boolean isAbstract() {
-		return ClassAccessInfo.ABSTRACT.isEnabled(accessFlags);
+		return AccessFlags.ABSTRACT.isEnabled(accessFlags);
 	}
 
 	/**
 	 * Declared synthetic; not present in the source code.
 	 */
 	public boolean isSynthetic() {
-		return ClassAccessInfo.SYNTHETIC.isEnabled(accessFlags);
+		return AccessFlags.SYNTHETIC.isEnabled(accessFlags);
 	}
 
 	/**
 	 * Declared as an annotation type.
 	 */
 	public boolean isAnnotation() {
-		return ClassAccessInfo.ANNOTATION.isEnabled(accessFlags);
+		return AccessFlags.ANNOTATION.isEnabled(accessFlags);
 	}
 
 	/**
 	 * Declared as an enum type.
 	 */
 	public boolean isEnum() {
-		return ClassAccessInfo.ENUM.isEnabled(accessFlags);
+		return AccessFlags.ENUM.isEnabled(accessFlags);
 	}
 
 	/**
 	 * Is a module, not a class or interface.
 	 */
 	public boolean isModule() {
-		return ClassAccessInfo.MODULE.isEnabled(accessFlags);
+		return AccessFlags.MODULE.isEnabled(accessFlags);
 	}
 
 	/**
@@ -332,42 +332,5 @@ public class ClassInfo {
 			attributes = attributeInfos.toArray(new AttributeInfo[attributeInfos.size()]);
 		}
 		return attributes;
-	}
-
-	/**
-	 * Access information about the class from the access-flags.
-	 */
-	public static enum ClassAccessInfo {
-		/** Declared final; no subclasses allowed. */
-		FINAL(0x0010),
-		/** Treat superclass methods specially when invoked by the invoke-special instruction. */
-		SUPER(0x0020),
-		/** Is an interface, not a class. */
-		INTERFACE(0x0200),
-		/** Declared abstract; must not be instantiated. */
-		ABSTRACT(0x0400),
-		/** Declared synthetic; not present in the source code. */
-		SYNTHETIC(0x1000),
-		/** Declared as an annotation type. */
-		ANNOTATION(0x2000),
-		/** Declared as an enum type. */
-		ENUM(0x4000),
-		/** Is a module, not a class or interface. */
-		MODULE(0x8000),
-		// end
-		;
-
-		private final int bit;
-
-		private ClassAccessInfo(int bit) {
-			this.bit = bit;
-		}
-
-		/**
-		 * Return true if the access-flags have this access-info bit set.
-		 */
-		public boolean isEnabled(int accessFlags) {
-			return ((accessFlags & bit) != 0);
-		}
 	}
 }
