@@ -1,5 +1,6 @@
 package com.j256.simpleclassreader;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -18,6 +19,7 @@ import org.junit.Test;
 
 import com.j256.simpleclassreader.attribute.AnnotationInfo;
 import com.j256.simpleclassreader.attribute.AnnotationNameValue;
+import com.j256.simpleclassreader.attribute.InnerClassesAttribute.InnerClassInfo;
 
 public class ClassReaderTest {
 
@@ -78,7 +80,7 @@ public class ClassReaderTest {
 			assertTrue(major > 50);
 			assertEquals(0, info.getMinorVersion());
 			assertEquals(JdkVersion.fromMajor(major).getJdkString() + ".0", info.getJdkVersionString());
-			assertTrue(info.getAccessFlags() != 0);
+			assertArrayEquals(new AccessFlag[] { AccessFlag.SUPER }, info.getAccessFlags());
 			assertFalse(info.isAbstract());
 			assertFalse(info.isSynthetic());
 			assertFalse(info.isAnnotation());
@@ -119,7 +121,7 @@ public class ClassReaderTest {
 		String path = classToPath(TestInterface.class);
 		try (InputStream fis = new FileInputStream(path);) {
 			ClassInfo info = ClassReader.readClass(fis);
-			assertTrue(info.getAccessFlags() != 0);
+			assertArrayEquals(new AccessFlag[] { AccessFlag.INTERFACE, AccessFlag.ABSTRACT }, info.getAccessFlags());
 			assertTrue(info.isAbstract());
 			assertFalse(info.isSynthetic());
 			assertFalse(info.isAnnotation());
@@ -161,6 +163,12 @@ public class ClassReaderTest {
 			assertEquals(2, arrayValues[0].getConstValue());
 			assertEquals(4, arrayValues[1].getConstIntValue());
 			assertEquals(8, arrayValues[2].getConstIntValue());
+			InnerClassInfo[] innerClasses = info.getInnerClasses();
+			assertNotNull(innerClasses);
+			assertEquals(3, innerClasses.length);
+			for (int i = 0; i < innerClasses.length; i++) {
+				System.out.println(i + ": " + innerClasses[i]);
+			}
 			System.err.println("parse errors: " + info.getParseErrors());
 		}
 	}
@@ -197,7 +205,7 @@ public class ClassReaderTest {
 	}
 
 	@Retention(value = RetentionPolicy.RUNTIME)
-	public @interface TestAnnotation {
+	private @interface MyAnnotation {
 		public byte byteValue();
 
 		public char charValue();
@@ -223,9 +231,9 @@ public class ClassReaderTest {
 		public int[] arrayValue();
 	}
 
-	@TestAnnotation(byteValue = 123, charValue = 'h', shortValue = 31241, intValue = 1021341,
-			longValue = 3213123123123L, floatValue = 1.23F, doubleValue = 21348.2323D, stringValue = "hello",
-			booleanValue = true, enumValue = MyNum.BAR, classValue = String.class, arrayValue = { 2, 4, 8 })
+	@MyAnnotation(byteValue = 123, charValue = 'h', shortValue = 31241, intValue = 1021341, longValue = 3213123123123L,
+			floatValue = 1.23F, doubleValue = 21348.2323D, stringValue = "hello", booleanValue = true,
+			enumValue = MyNum.BAR, classValue = String.class, arrayValue = { 2, 4, 8 })
 	private static class AnnotationTest {
 		// for testing annotations only
 	}

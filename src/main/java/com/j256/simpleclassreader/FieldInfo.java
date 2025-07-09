@@ -113,7 +113,7 @@ public class FieldInfo {
 	 * Get the access-flags as an array of enums.
 	 */
 	public AccessFlag[] getAccessFlags() {
-		return AccessFlag.extractFlags(accessFlags, true, false);
+		return AccessFlag.extractFlags(accessFlags, false, true, false);
 	}
 
 	/**

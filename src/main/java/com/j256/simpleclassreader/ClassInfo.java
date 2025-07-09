@@ -148,7 +148,7 @@ public class ClassInfo {
 	 * Get the access-flags as an array of enums.
 	 */
 	public AccessFlag[] getAccessFlags() {
-		return AccessFlag.extractFlags(accessFlags, false, false);
+		return AccessFlag.extractFlags(accessFlags, true, false, false);
 	}
 
 	/**
