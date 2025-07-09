@@ -42,6 +42,15 @@ public enum AttributeType {
 			return result;
 		}
 	},
+	INNER_CLASSES("InnerClasses") {
+		@Override
+		public <T> T read(DataInputStream dis, int length, ConstantPool constantPool,
+				List<ClassReaderError> parseErrors) throws IOException {
+			@SuppressWarnings("unchecked")
+			T result = (T) InnerClassesAttribute.read(dis, constantPool, parseErrors);
+			return result;
+		}
+	},
 	RUNTIME_VISIBLE_ANNOTATIONS("RuntimeVisibleAnnotations") {
 		@Override
 		public <T> T read(DataInputStream dis, int length, ConstantPool constantPool,
