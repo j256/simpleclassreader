@@ -59,6 +59,24 @@ public enum AttributeType {
 			return result;
 		}
 	},
+	LINE_UMBER_TABLE("LineNumberTable") {
+		@Override
+		public <T> T read(DataInputStream dis, int length, ConstantPool constantPool,
+				List<ClassReaderError> parseErrors) throws IOException {
+			@SuppressWarnings("unchecked")
+			T result = (T) LineNumberTableAttribute.read(dis, constantPool, parseErrors);
+			return result;
+		}
+	},
+	LOCAL_VARIABLE_TABLE("LocalVariableTable") {
+		@Override
+		public <T> T read(DataInputStream dis, int length, ConstantPool constantPool,
+				List<ClassReaderError> parseErrors) throws IOException {
+			@SuppressWarnings("unchecked")
+			T result = (T) LocalVariableTableAttribute.read(dis, constantPool, parseErrors);
+			return result;
+		}
+	},
 	RUNTIME_VISIBLE_ANNOTATIONS("RuntimeVisibleAnnotations") {
 		@Override
 		public <T> T read(DataInputStream dis, int length, ConstantPool constantPool,
