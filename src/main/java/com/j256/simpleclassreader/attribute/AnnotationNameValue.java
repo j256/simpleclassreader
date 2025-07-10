@@ -78,7 +78,7 @@ public class AnnotationNameValue {
 				constValue = (constValue == null ? null : (byte) (int) constValue);
 				break;
 			/** short constant value type */
-			case CHAR:
+			case CHARACTER:
 				// u2 const_value_index;
 				// read as an integer
 				valueIndex = dis.readUnsignedShort();
@@ -198,7 +198,7 @@ public class AnnotationNameValue {
 	}
 
 	/**
-	 * Return the constant value if the tag is {@link AnnotationValueTag#BYTE}, {@link AnnotationValueTag#CHAR},
+	 * Return the constant value if the tag is {@link AnnotationValueTag#BYTE}, {@link AnnotationValueTag#CHARACTER},
 	 * {@link AnnotationValueTag#SHORT}, {@link AnnotationValueTag#INTEGER}, {@link AnnotationValueTag#LONG},
 	 * {@link AnnotationValueTag#FLOAT}, {@link AnnotationValueTag#DOUBLE}, {@link AnnotationValueTag#BOOLEAN}, and
 	 * {@link AnnotationValueTag#STRING}.
@@ -211,63 +211,99 @@ public class AnnotationNameValue {
 	 * Return the constant value if the tag is {@link AnnotationValueTag#BYTE}.
 	 */
 	public Byte getConstByteValue() {
-		return (constValue == null ? null : (byte) (int) constValue);
+		if (tag == AnnotationValueTag.BYTE) {
+			return (Byte) constValue;
+		} else {
+			throw new IllegalArgumentException("annotation name/value has " + tag + " tag, not byte");
+		}
 	}
 
 	/**
-	 * Return the constant value if the tag is {@link AnnotationValueTag#CHAR}.
+	 * Return the constant value if the tag is {@link AnnotationValueTag#CHARACTER}.
 	 */
-	public char getConstCharValue() {
-		return (constValue == null ? null : (char) (int) constValue);
+	public Character getConstCharacterValue() {
+		if (tag == AnnotationValueTag.CHARACTER) {
+			return (Character) constValue;
+		} else {
+			throw new IllegalArgumentException("annotation name/value has " + tag + " tag, not characterr");
+		}
 	}
 
 	/**
 	 * Return the constant value if the tag is {@link AnnotationValueTag#SHORT}.
 	 */
-	public short getConstShortValue() {
-		return (constValue == null ? null : (short) (int) constValue);
+	public Short getConstShortValue() {
+		if (tag == AnnotationValueTag.SHORT) {
+			return (Short) constValue;
+		} else {
+			throw new IllegalArgumentException("annotation name/value has " + tag + " tag, not short");
+		}
 	}
 
 	/**
 	 * Return the constant value if the tag is {@link AnnotationValueTag#INTEGER}.
 	 */
-	public int getConstIntValue() {
-		return (Integer) constValue;
+	public Integer getConstIntegerValue() {
+		if (tag == AnnotationValueTag.INTEGER) {
+			return (Integer) constValue;
+		} else {
+			throw new IllegalArgumentException("annotation name/value has " + tag + " tag, not integer");
+		}
 	}
 
 	/**
 	 * Return the constant value if the tag is {@link AnnotationValueTag#LONG}.
 	 */
 	public Long getConstLongValue() {
-		return (Long) constValue;
+		if (tag == AnnotationValueTag.LONG) {
+			return (Long) constValue;
+		} else {
+			throw new IllegalArgumentException("annotation name/value has " + tag + " tag, not long");
+		}
 	}
 
 	/**
 	 * Return the constant value if the tag is {@link AnnotationValueTag#FLOAT}.
 	 */
 	public Float getConstFloatValue() {
-		return (Float) constValue;
+		if (tag == AnnotationValueTag.FLOAT) {
+			return (Float) constValue;
+		} else {
+			throw new IllegalArgumentException("annotation name/value has " + tag + " tag, not float");
+		}
 	}
 
 	/**
 	 * Return the constant value if the tag is {@link AnnotationValueTag#DOUBLE}.
 	 */
 	public Double getConstDoubleValue() {
-		return (Double) constValue;
+		if (tag == AnnotationValueTag.DOUBLE) {
+			return (Double) constValue;
+		} else {
+			throw new IllegalArgumentException("annotation name/value has " + tag + " tag, not double");
+		}
 	}
 
 	/**
 	 * Return the constant value if the tag is {@link AnnotationValueTag#BOOLEAN}.
 	 */
-	public boolean getConstBooleanValue() {
-		return (constValue == null || (int) constValue == 0 ? false : true);
+	public Boolean getConstBooleanValue() {
+		if (tag == AnnotationValueTag.BOOLEAN) {
+			return (Boolean) constValue;
+		} else {
+			throw new IllegalArgumentException("annotation name/value has " + tag + " tag, not boolean");
+		}
 	}
 
 	/**
 	 * Return the constant value if the tag is {@link AnnotationValueTag#STRING}.
 	 */
 	public String getConstStringValue() {
-		return (String) constValue;
+		if (tag == AnnotationValueTag.STRING) {
+			return (String) constValue;
+		} else {
+			throw new IllegalArgumentException("annotation name/value has " + tag + " tag, not string");
+		}
 	}
 
 	/**
@@ -310,7 +346,7 @@ public class AnnotationNameValue {
 		/** byte constant value type converted from int */
 		BYTE('B'),
 		/** char constant value type converted from int */
-		CHAR('C'),
+		CHARACTER('C'),
 		/** short constant value type converted from int */
 		SHORT('S'),
 		/** int constant value type */

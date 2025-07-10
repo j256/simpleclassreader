@@ -139,8 +139,9 @@ public class ConstantPool {
 	public Object findValue(int index) {
 		if (index >= values.length) {
 			return null;
+		} else {
+			return values[index];
 		}
-		return values[index];
 	}
 
 	private static String readUtf8(DataInputStream dis) throws IOException {
@@ -148,15 +149,16 @@ public class ConstantPool {
 		if (nameLength < 0 && nameLength > 256) {
 			System.err.println("Invalid utf8 name-length: " + nameLength);
 			return null;
+		} else {
+			byte[] nameBytes = Utils.readLength(dis, nameLength);
+			return new String(nameBytes, StandardCharsets.UTF_8);
 		}
-		byte[] nameBytes = Utils.readLength(dis, nameLength);
-		return new String(nameBytes, StandardCharsets.UTF_8);
 	}
 
-	private static DoubleInt readRef(DataInputStream dis) throws IOException {
+	private static TwoIntegerEntry readRef(DataInputStream dis) throws IOException {
 		int classIndex = dis.readUnsignedShort();
 		int nameAndTypeIndex = dis.readUnsignedShort();
-		return new DoubleInt(classIndex, nameAndTypeIndex);
+		return new TwoIntegerEntry(classIndex, nameAndTypeIndex);
 	}
 
 	private static int readInteger(DataInputStream dis) throws IOException {
@@ -175,22 +177,22 @@ public class ConstantPool {
 		return dis.readDouble();
 	}
 
-	private static DoubleInt readNameAndType(DataInputStream dis) throws IOException {
+	private static TwoIntegerEntry readNameAndType(DataInputStream dis) throws IOException {
 		int nameIndex = dis.readUnsignedShort();
 		int descriptorIndex = dis.readUnsignedShort();
-		return new DoubleInt(nameIndex, descriptorIndex);
+		return new TwoIntegerEntry(nameIndex, descriptorIndex);
 	}
 
-	private static DoubleInt readMethodHandle(DataInputStream dis) throws IOException {
+	private static TwoIntegerEntry readMethodHandle(DataInputStream dis) throws IOException {
 		int refKind = dis.read();
 		int referenceIndex = dis.readUnsignedShort();
-		return new DoubleInt(refKind, referenceIndex);
+		return new TwoIntegerEntry(refKind, referenceIndex);
 	}
 
-	private static DoubleInt readInvokeDynamic(DataInputStream dis) throws IOException {
+	private static TwoIntegerEntry readInvokeDynamic(DataInputStream dis) throws IOException {
 		int bootstrapMethodAttrIndex = dis.readUnsignedShort();
 		int nameAndTypeIndex = dis.readUnsignedShort();
-		return new DoubleInt(bootstrapMethodAttrIndex, nameAndTypeIndex);
+		return new TwoIntegerEntry(bootstrapMethodAttrIndex, nameAndTypeIndex);
 	}
 
 	/**
@@ -251,12 +253,12 @@ public class ConstantPool {
 	/**
 	 * Two integer entry in constant pool.
 	 */
-	public static class DoubleInt {
+	public static class TwoIntegerEntry {
 
 		private final int first;
 		private final int second;
 
-		public DoubleInt(int first, int second) {
+		public TwoIntegerEntry(int first, int second) {
 			this.first = first;
 			this.second = second;
 		}
@@ -267,11 +269,6 @@ public class ConstantPool {
 
 		public int getSecond() {
 			return second;
-		}
-
-		@Override
-		public String toString() {
-			return first + ":" + second;
 		}
 	}
 }

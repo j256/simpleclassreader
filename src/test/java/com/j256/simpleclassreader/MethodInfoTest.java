@@ -1,5 +1,6 @@
 package com.j256.simpleclassreader;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -56,8 +57,24 @@ public class MethodInfoTest {
 					DataDescriptor[] paramDescriptors = methodInfo.getParameterDataDescriptors();
 					assertNotNull(paramDescriptors);
 					assertEquals(2, paramDescriptors.length);
-					assertEquals(String.class, paramDescriptors[0].getDataClass());
-					assertEquals(Float.TYPE, paramDescriptors[1].getDataClass());
+					assertEquals(AccessFlag.PUBLIC.getBit(), methodInfo.getAccessFlagsValue());
+					assertArrayEquals(new AccessFlag[] { AccessFlag.PUBLIC }, methodInfo.getAccessFlags());
+					assertTrue(methodInfo.isPublic());
+					assertFalse(methodInfo.isPrivate());
+					assertFalse(methodInfo.isProtected());
+					assertFalse(methodInfo.isStatic());
+					assertFalse(methodInfo.isFinal());
+					assertFalse(methodInfo.isSynchronized());
+					assertFalse(methodInfo.isBridge());
+					assertFalse(methodInfo.isVarargs());
+					assertFalse(methodInfo.isNative());
+					assertFalse(methodInfo.isAbstract());
+					assertFalse(methodInfo.isStrict());
+					assertFalse(methodInfo.isSynthetic());
+					assertFalse(methodInfo.isConstructor());
+					assertEquals("(Ljava/lang/String;F)F", methodInfo.getMethodDescriptor().toString());
+					assertArrayEquals(new String[] { "java.io.IOException" }, methodInfo.getExceptions());
+					assertEquals("method " + methodInfo.getName(), methodInfo.toString());
 				} else {
 					assertFalse(methodInfo.isDeprecated());
 				}

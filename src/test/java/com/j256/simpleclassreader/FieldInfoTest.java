@@ -14,6 +14,9 @@ import java.lang.reflect.Field;
 
 import org.junit.Test;
 
+import com.j256.simpleclassreader.attribute.AttributeType;
+import com.j256.simpleclassreader.attribute.RuntimeVisibleAnnotationsAttribute;
+
 public class FieldInfoTest {
 	@Test
 	public void testStuff() throws IOException {
@@ -52,11 +55,14 @@ public class FieldInfoTest {
 					assertFalse(fieldInfo.isEnum());
 					AttributeInfo[] attributeInfos = fieldInfo.getAttributeInfos();
 					assertNotNull(attributeInfos);
-					assertEquals(0, attributeInfos.length);
+					assertEquals(2, attributeInfos.length);
+					assertEquals(AttributeType.DEPRECATED, attributeInfos[0].getType());
+					assertEquals(AttributeType.RUNTIME_VISIBLE_ANNOTATIONS, attributeInfos[1].getType());
+					assertEquals("",
+							((RuntimeVisibleAnnotationsAttribute) attributeInfos[1].getValue()).getAnnotations());
 					assertNull(fieldInfo.getConstantValue());
-					assertNull(fieldInfo.getRuntimeAnnotations());
-					assertNull(fieldInfo.getRuntimeAnnotations());
-					assertFalse(fieldInfo.isDeprecated());
+					assertEquals(1, fieldInfo.getRuntimeAnnotations().length);
+					assertTrue(fieldInfo.isDeprecated());
 					assertEquals("field " + fieldInfo.getName(), fieldInfo.toString());
 				}
 			}
@@ -69,29 +75,15 @@ public class FieldInfoTest {
 	}
 
 	@SuppressWarnings("unused")
-	private static class TestClass implements Runnable {
+	private static class TestClass {
 
 		public static int foo;
 		private float bar;
+		@Deprecated
 		protected String zip;
 
 		public TestClass(float bar) {
 			this.bar = bar;
-		}
-
-		@Deprecated
-		public float changeBar(String message, float newBar) throws IOException {
-			bar = newBar;
-			return bar;
-		}
-
-		@Override
-		public void run() {
-			// do thread stuff
-		}
-
-		public static class Inner {
-			// empty
 		}
 	}
 }
