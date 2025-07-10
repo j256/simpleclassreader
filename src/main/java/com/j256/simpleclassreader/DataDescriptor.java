@@ -28,12 +28,13 @@ public class DataDescriptor {
 	 * Return a data descriptor which is converted from the string representation.
 	 */
 	public static DataDescriptor fromString(String str, MutableIndex mutableIndex) {
-		int index;
+		int start;
 		if (mutableIndex == null) {
-			index = 0;
+			start = 0;
 		} else {
-			index = mutableIndex.value;
+			start = mutableIndex.value;
 		}
+		int index = start;
 		for (; index < str.length(); index++) {
 			if (str.charAt(index) != '[') {
 				break;
@@ -42,7 +43,7 @@ public class DataDescriptor {
 		if (index >= str.length()) {
 			return null;
 		}
-		int arrayCount = index;
+		int arrayCount = index - start;
 		ComponentType componentType = ComponentType.fromChar(str.charAt(index));
 		if (componentType == null) {
 			return null;
@@ -98,12 +99,14 @@ public class DataDescriptor {
 	/**
 	 * Return if this type is an object reference type.
 	 */
-	public boolean isObject() {
+	public boolean isReference() {
 		return (componentType == ComponentType.REFERENCE);
 	}
 
 	/**
-	 * Return the primitive data-class of the data-type or Object.class if it is an object reference.
+	 * Return the primitive data-class of the data-type or null if it is an object reference. If the type is a reference
+	 * then you should use {@link #getDataClassName()} to get the type of the reference since we don't want to load the
+	 * class here.
 	 */
 	public Class<?> getDataClass() {
 		return componentType.dataClass;
@@ -147,7 +150,8 @@ public class DataDescriptor {
 		FLOAT('F', true, Float.TYPE),
 		INT('I', true, Integer.TYPE),
 		LONG('J', true, Long.TYPE),
-		REFERENCE('L', false, Object.class),
+		/* NOTE: the data-type is null because we can't instantiate the class here and data-class-name should be used */
+		REFERENCE('L', false, null),
 		SHORT('S', true, Short.TYPE),
 		BOOLEAN('Z', true, Boolean.TYPE),
 		VOID('V', true, Void.TYPE),

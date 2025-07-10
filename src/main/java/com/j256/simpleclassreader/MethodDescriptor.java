@@ -15,13 +15,13 @@ public class MethodDescriptor {
 	static final DataDescriptor[] EMPTY_PARAMS = new DataDescriptor[0];
 
 	private final String descriptorStr;
-	private final DataDescriptor[] parameterDataDescriptors;
+	private final DataDescriptor[] parameterDescriptors;
 	private final DataDescriptor returnDescriptor;
 
-	public MethodDescriptor(String descriptorStr, DataDescriptor[] parameterDataDescriptors,
+	public MethodDescriptor(String descriptorStr, DataDescriptor[] parameterDescriptors,
 			DataDescriptor returnDescriptor) {
 		this.descriptorStr = descriptorStr;
-		this.parameterDataDescriptors = parameterDataDescriptors;
+		this.parameterDescriptors = parameterDescriptors;
 		this.returnDescriptor = returnDescriptor;
 	}
 
@@ -35,8 +35,8 @@ public class MethodDescriptor {
 	/**
 	 * Returns the parsed parameter descriptors.
 	 */
-	public DataDescriptor[] getParameterDataDescriptors() {
-		return parameterDataDescriptors;
+	public DataDescriptor[] getParameterDescriptors() {
+		return parameterDescriptors;
 	}
 
 	/**
@@ -63,19 +63,19 @@ public class MethodDescriptor {
 		// we need to track the index because we are parsing multiple data descriptors from the descriptor string
 		MutableIndex mutableIndex = new MutableIndex(1);
 
-		List<DataDescriptor> parameterDataDescriptors = null;
+		List<DataDescriptor> parameterDescriptors = null;
 		while (descriptorStr.charAt(mutableIndex.getValue()) != ')') {
-			if (parameterDataDescriptors == null) {
-				parameterDataDescriptors = new ArrayList<>();
+			if (parameterDescriptors == null) {
+				parameterDescriptors = new ArrayList<>();
 			}
-			parameterDataDescriptors.add(DataDescriptor.fromString(descriptorStr, mutableIndex));
+			parameterDescriptors.add(DataDescriptor.fromString(descriptorStr, mutableIndex));
 		}
 		// skip over the ')'
 		mutableIndex.increment(1);
 
 		DataDescriptor[] params = EMPTY_PARAMS;
-		if (parameterDataDescriptors != null) {
-			params = parameterDataDescriptors.toArray(new DataDescriptor[parameterDataDescriptors.size()]);
+		if (parameterDescriptors != null) {
+			params = parameterDescriptors.toArray(new DataDescriptor[parameterDescriptors.size()]);
 		}
 
 		DataDescriptor returnDescriptor = DataDescriptor.fromString(descriptorStr, mutableIndex);
