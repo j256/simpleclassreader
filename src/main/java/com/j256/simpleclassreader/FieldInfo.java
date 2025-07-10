@@ -201,21 +201,24 @@ public class FieldInfo {
 	}
 
 	/**
-	 * Get the value of the constant-value attribute.
+	 * Returns the value of the constant-value attribute if any of the attributes are of type
+	 * {@link AttributeType#CONSTANT_VALUE} or null if none.
 	 */
 	public Object getConstantValue() {
 		return constantValue;
 	}
 
 	/**
-	 * Get the runtime annotations of the field.
+	 * Returns the runtime annotations of the field if any of the attributes are of type
+	 * {@link AttributeType#RUNTIME_VISIBLE_ANNOTATIONS} or null if none.
 	 */
 	public AnnotationInfo[] getRuntimeAnnotations() {
 		return runtimeAnnotations;
 	}
 
 	/**
-	 * Is the field marked with the Deprecated attribute.
+	 * Returns true if this field is marked with the Deprecated attribute if any of the attributes are of type
+	 * {@link AttributeType#DEPRECATED} otherwise false.
 	 */
 	public boolean isDeprecated() {
 		return deprecated;

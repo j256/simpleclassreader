@@ -77,6 +77,13 @@ public enum AccessFlag {
 	}
 
 	/**
+	 * Bit value of this flag.
+	 */
+	public int getBit() {
+		return bit;
+	}
+
+	/**
 	 * Return the string version of the access-flags.
 	 * 
 	 * @param accessFlags

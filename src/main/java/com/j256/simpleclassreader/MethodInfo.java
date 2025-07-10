@@ -237,7 +237,7 @@ public class MethodInfo {
 		if (methodDescriptor == null) {
 			return null;
 		} else {
-			return methodDescriptor.getParameterDataDescriptors();
+			return methodDescriptor.getParameterDescriptors();
 		}
 	}
 
