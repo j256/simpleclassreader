@@ -25,7 +25,7 @@ public class AnnotationNameValue {
 	private final AnnotationInfo subAnnotationValue;
 	private final AnnotationNameValue[] arrayValues;
 
-	public AnnotationNameValue(String typeName, AnnotationValueTag tag, Object constValue,
+	private AnnotationNameValue(String typeName, AnnotationValueTag tag, Object constValue,
 			EnumAnnotationValue enumValue, String classValue, AnnotationInfo subAnnotationValue,
 			AnnotationNameValue[] arrayValues) {
 		this.typeName = typeName;
@@ -128,7 +128,8 @@ public class AnnotationNameValue {
 				int typeIndex = dis.readUnsignedShort();
 				String enumType = constantPool.findName(typeIndex);
 				if (enumType == null) {
-					parseErrors.add(new ClassReaderError(ClassReaderErrorType.ANNOTATION_ENUM_NAME_INDEX_INVALID, typeIndex));
+					parseErrors.add(
+							new ClassReaderError(ClassReaderErrorType.ANNOTATION_ENUM_NAME_INDEX_INVALID, typeIndex));
 					return null;
 				}
 				DataDescriptor descriptor = DataDescriptor.fromString(enumType);
@@ -138,7 +139,8 @@ public class AnnotationNameValue {
 				nameIndex = dis.readUnsignedShort();
 				String enumConstant = constantPool.findName(nameIndex);
 				if (enumConstant == null) {
-					parseErrors.add(new ClassReaderError(ClassReaderErrorType.ANNOTATION_ENUM_CONST_INDEX_INVALID, nameIndex));
+					parseErrors.add(
+							new ClassReaderError(ClassReaderErrorType.ANNOTATION_ENUM_CONST_INDEX_INVALID, nameIndex));
 					return null;
 				}
 				enumValue = new EnumAnnotationValue(enumType, enumConstant);

@@ -21,7 +21,7 @@ public class AnnotationInfo {
 	private final String type;
 	private final AnnotationNameValue[] values;
 
-	public AnnotationInfo(String type, AnnotationNameValue[] values) {
+	private AnnotationInfo(String type, AnnotationNameValue[] values) {
 		this.type = type;
 		this.values = values;
 	}

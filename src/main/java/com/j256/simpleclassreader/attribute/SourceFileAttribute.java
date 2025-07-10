@@ -16,7 +16,7 @@ public class SourceFileAttribute {
 
 	private final String sourceFile;
 
-	public SourceFileAttribute(String sourceFile) {
+	private SourceFileAttribute(String sourceFile) {
 		this.sourceFile = sourceFile;
 	}
 

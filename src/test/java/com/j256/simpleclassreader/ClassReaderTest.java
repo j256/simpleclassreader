@@ -35,16 +35,17 @@ public class ClassReaderTest {
 			FieldInfo[] fields = info.getFields();
 			// NOTE: there might be artificial fields when running with coverage data
 			for (int i = 0; i < fields.length; i++) {
+				FieldInfo fieldInfo = fields[i];
 				Field reflectionField = null;
 				for (Field field : reflectionFields) {
-					if (fields[i].getName().equals(field.getName())) {
+					if (fieldInfo.getName().equals(field.getName())) {
 						reflectionField = field;
 					}
 				}
 				assertNotNull(reflectionField);
-				assertEquals(reflectionField.getName(), fields[i].getName());
-				assertEquals(reflectionField.getType().getName(), fields[i].getDataDescriptor().getDataClassName());
-				assertEquals(reflectionField.isSynthetic(), fields[i].isSynthetic());
+				assertEquals(reflectionField.getName(), fieldInfo.getName());
+				assertEquals(reflectionField.getType().getName(), fieldInfo.getDataDescriptor().getDataClassName());
+				assertEquals(reflectionField.isSynthetic(), fieldInfo.isSynthetic());
 			}
 			Constructor<?>[] reflectionConstructors = TestClass.class.getDeclaredConstructors();
 			MethodInfo[] constructors = info.getConstructors();

@@ -11,7 +11,8 @@ import com.j256.simpleclassreader.ConstantPool;
 import com.j256.simpleclassreader.Utils;
 
 /**
- * Source-file that generated the class.
+ * The inner or referenced classes associated with the class. This means inner classes but also classes such as
+ * annotations that are referenced by this class.
  * 
  * @author graywatson
  */
@@ -19,7 +20,7 @@ public class InnerClassesAttribute {
 
 	private final InnerClassInfo[] innerClasses;
 
-	public InnerClassesAttribute(InnerClassInfo[] innerClasses) {
+	private InnerClassesAttribute(InnerClassInfo[] innerClasses) {
 		this.innerClasses = innerClasses;
 	}
 

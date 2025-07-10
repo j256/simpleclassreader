@@ -9,7 +9,7 @@ import com.j256.simpleclassreader.ClassReaderError;
 import com.j256.simpleclassreader.ConstantPool;
 
 /**
- * Exceptions that are thrown by a method attribute.
+ * Runtime visible annotations associated with class, field, and methods.
  * 
  * @author graywatson
  */
@@ -17,7 +17,7 @@ public class RuntimeVisibleAnnotationsAttribute {
 
 	private final AnnotationInfo[] annotations;
 
-	public RuntimeVisibleAnnotationsAttribute(AnnotationInfo[] annotations) {
+	private RuntimeVisibleAnnotationsAttribute(AnnotationInfo[] annotations) {
 		this.annotations = annotations;
 	}
 

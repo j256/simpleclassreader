@@ -23,7 +23,7 @@ public class CodeAttribute {
 	private final ExceptionTable[] exceptions;
 	private final AttributeInfo[] attributes;
 
-	public CodeAttribute(int maxStack, int maxLocals, byte[] code, ExceptionTable[] exceptions,
+	private CodeAttribute(int maxStack, int maxLocals, byte[] code, ExceptionTable[] exceptions,
 			AttributeInfo[] attributes) {
 		this.maxStack = maxStack;
 		this.maxLocals = maxLocals;

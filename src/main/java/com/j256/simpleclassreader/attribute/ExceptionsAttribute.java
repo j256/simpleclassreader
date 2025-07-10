@@ -20,7 +20,7 @@ public class ExceptionsAttribute {
 
 	private final String[] exceptions;
 
-	public ExceptionsAttribute(String[] exceptions) {
+	private ExceptionsAttribute(String[] exceptions) {
 		this.exceptions = exceptions;
 	}
 
