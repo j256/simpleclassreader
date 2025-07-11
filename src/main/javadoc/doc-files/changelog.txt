@@ -1,4 +1,4 @@
-0.3: 07/??/2025
+0.3: 07/11/2025
 	* More attribute support: annotations, deprecated, inner classes, line numbers, local variables.
 	* Switched to using centralized AccessFlag enum for classes, fields, and methods.
 	* Changed the parse errors to have a type and a optional argument.
