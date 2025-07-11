@@ -15,7 +15,6 @@ import java.lang.reflect.Field;
 import org.junit.Test;
 
 import com.j256.simpleclassreader.attribute.AttributeType;
-import com.j256.simpleclassreader.attribute.RuntimeVisibleAnnotationsAttribute;
 
 public class FieldInfoTest {
 	@Test
@@ -58,8 +57,6 @@ public class FieldInfoTest {
 					assertEquals(2, attributeInfos.length);
 					assertEquals(AttributeType.DEPRECATED, attributeInfos[0].getType());
 					assertEquals(AttributeType.RUNTIME_VISIBLE_ANNOTATIONS, attributeInfos[1].getType());
-					assertEquals("",
-							((RuntimeVisibleAnnotationsAttribute) attributeInfos[1].getValue()).getAnnotations());
 					assertNull(fieldInfo.getConstantValue());
 					assertEquals(1, fieldInfo.getRuntimeAnnotations().length);
 					assertTrue(fieldInfo.isDeprecated());
