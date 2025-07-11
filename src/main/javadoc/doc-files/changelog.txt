@@ -1,7 +1,8 @@
 0.3: 07/??/2025
-	* Added more attribute support: runtime annotations, deprecated, inner classes, ... 
+	* More attribute support: annotations, deprecated, inner classes, line numbers, local variables.
 	* Switched to using centralized AccessFlag enum for classes, fields, and methods.
 	* Changed the parse errors to have a type and a optional argument.
+	* Fleshed out the tests.
 
 0.2: 07/07/2025
 	* Fixed problem with the exception attribute.  Half baked check in there. 
