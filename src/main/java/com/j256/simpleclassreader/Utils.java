@@ -16,7 +16,7 @@ public class Utils {
 	/**
 	 * Return a byte[] with the length bytes from the input-stream.
 	 */
-	public static byte[] readLength(DataInputStream dis, int length) throws IOException {
+	public static byte[] readBytes(DataInputStream dis, int length) throws IOException {
 		// shortcut if the length is small, no reason to pay for the reallocs
 		if (length <= BUFFER_SIZE) {
 			byte[] bytes = new byte[length];
@@ -26,8 +26,8 @@ public class Utils {
 
 		/*
 		 * We jump through these hoops because we are worried that length is invalid and we want to hit the EOF before
-		 * we do the new byte[length] and possibly allocate a huge buffer unnecessarily. This will cause us to realloc a
-		 * bunch if the byte[] is large.
+		 * we do the new byte[length] and possibly allocate a huge buffer unnecessarily. Yes, this will cause us to
+		 * realloc a bunch if the byte[] is large.
 		 */
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		byte[] buffer = new byte[BUFFER_SIZE];

@@ -54,7 +54,7 @@ public class CodeAttribute {
 		int maxStack = dis.readUnsignedShort();
 		int maxLocals = dis.readUnsignedShort();
 		int codeLength = dis.readInt();
-		byte[] code = Utils.readLength(dis, codeLength);
+		byte[] code = Utils.readBytes(dis, codeLength);
 		int exceptionTableLength = dis.readUnsignedShort();
 		ExceptionTable[] exceptions = new ExceptionTable[exceptionTableLength];
 		for (int i = 0; i < exceptions.length; i++) {

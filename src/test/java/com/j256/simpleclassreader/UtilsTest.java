@@ -41,7 +41,7 @@ public class UtilsTest {
 		byte[] output;
 		try (InputStream stream = new ByteArrayInputStream(input); //
 				DataInputStream dis = new DataInputStream(stream);) {
-			output = Utils.readLength(dis, input.length - 1);
+			output = Utils.readBytes(dis, input.length - 1);
 		}
 		input = Arrays.copyOf(input, input.length - 1);
 		assertArrayEquals(input, output);
