@@ -14,13 +14,14 @@ import org.junit.Test;
 
 import com.j256.simpleclassreader.ClassInfo;
 import com.j256.simpleclassreader.ClassReader;
+import com.j256.simpleclassreader.TestUtils;
 import com.j256.simpleclassreader.attribute.InnerClassesAttribute.InnerClassInfo;
 
 public class AnnotationInfoTest {
 
 	@Test
 	public void testAnnotations() throws IOException {
-		String path = classToPath(AnnotationTest.class);
+		String path = TestUtils.classToPath(AnnotationTest.class);
 		try (InputStream fis = new FileInputStream(path);) {
 			ClassInfo info = ClassReader.readClass(fis);
 			AnnotationInfo[] annotations = info.getRuntimeAnnotations();
@@ -60,7 +61,7 @@ public class AnnotationInfoTest {
 
 	@Test
 	public void testWrongTypes() throws IOException {
-		String path = classToPath(AnnotationTest.class);
+		String path = TestUtils.classToPath(AnnotationTest.class);
 		try (InputStream fis = new FileInputStream(path);) {
 			ClassInfo info = ClassReader.readClass(fis);
 			AnnotationInfo[] annotations = info.getRuntimeAnnotations();
@@ -168,10 +169,6 @@ public class AnnotationInfoTest {
 		public Class<?> classValue();
 
 		public int[] arrayValue();
-	}
-
-	private String classToPath(Class<?> clazz) {
-		return "target/test-classes/" + clazz.getName().replace('.', '/') + ".class";
 	}
 
 	@MyAnnotation(byteValue = 123, charValue = 'h', shortValue = 31241, intValue = 1021341, longValue = 3213123123123L,

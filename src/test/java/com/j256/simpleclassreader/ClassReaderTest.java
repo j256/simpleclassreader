@@ -21,7 +21,7 @@ public class ClassReaderTest {
 
 	@Test
 	public void testStuff() throws IOException {
-		String path = classToPath(TestClass.class);
+		String path = TestUtils.classToPath(TestClass.class);
 		try (InputStream fis = new FileInputStream(path);) {
 			ClassInfo info = ClassReader.readClass(fis);
 			assertNotNull(info);
@@ -76,7 +76,7 @@ public class ClassReaderTest {
 
 	@Test
 	public void testCoverage() throws IOException {
-		String path = classToPath(TestClass.class);
+		String path = TestUtils.classToPath(TestClass.class);
 		try (InputStream fis = new FileInputStream(path);) {
 			ClassInfo info = ClassReader.readClass(fis);
 			int major = info.getMajorVersion();
@@ -106,7 +106,7 @@ public class ClassReaderTest {
 
 	@Test
 	public void testExceptions() throws IOException {
-		String path = classToPath(TestClass.class);
+		String path = TestUtils.classToPath(TestClass.class);
 		try (InputStream fis = new FileInputStream(path);) {
 			ClassInfo info = ClassReader.readClass(fis);
 			MethodInfo[] methods = info.getMethods();
@@ -127,7 +127,7 @@ public class ClassReaderTest {
 
 	@Test
 	public void testInterface() throws IOException {
-		String path = classToPath(TestInterface.class);
+		String path = TestUtils.classToPath(TestInterface.class);
 		try (InputStream fis = new FileInputStream(path);) {
 			ClassInfo info = ClassReader.readClass(fis);
 			assertArrayEquals(new AccessFlag[] { AccessFlag.INTERFACE, AccessFlag.ABSTRACT }, info.getAccessFlags());
@@ -146,10 +146,6 @@ public class ClassReaderTest {
 			}
 			System.err.println("parse errors: " + info.getParseErrors());
 		}
-	}
-
-	private String classToPath(Class<?> clazz) {
-		return "target/test-classes/" + clazz.getName().replace('.', '/') + ".class";
 	}
 
 	@SuppressWarnings("unused")

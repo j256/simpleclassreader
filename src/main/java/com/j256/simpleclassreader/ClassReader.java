@@ -3,6 +3,8 @@ package com.j256.simpleclassreader;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.EOFException;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -60,5 +62,22 @@ public class ClassReader {
 		DataInputStream dis = new DataInputStream(inputStream);
 		return ClassInfo.read(dis);
 		// NOTE: dis is not closed on purpose because that would close the underlying input-stream
+	}
+
+	/**
+	 * Read in a {@link ClassInfo} from a class file.
+	 * 
+	 * @param file
+	 *            Class file from disk.
+	 * @throws EOFException
+	 *             If the end of the input was reached prematurely. This probably indicates truncated or corrupted class
+	 *             information.
+	 * @throws IOException
+	 *             General input problem..
+	 */
+	public static ClassInfo readClass(File file) throws EOFException, IOException {
+		try (DataInputStream dis = new DataInputStream(new FileInputStream(file));) {
+			return ClassInfo.read(dis);
+		}
 	}
 }

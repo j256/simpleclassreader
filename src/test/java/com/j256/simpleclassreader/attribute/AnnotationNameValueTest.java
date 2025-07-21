@@ -12,5 +12,7 @@ public class AnnotationNameValueTest {
 	public void testTag() {
 		assertNull(AnnotationValueTag.fromChar(-1));
 		assertNull(AnnotationValueTag.fromChar(12345));
+		AnnotationValueTag tag = AnnotationValueTag.STRING;
+		assertEquals(tag, AnnotationValueTag.fromChar(tag.getTagChar()));
 	}
 }

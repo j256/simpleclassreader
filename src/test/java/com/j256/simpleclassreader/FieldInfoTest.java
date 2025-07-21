@@ -19,7 +19,7 @@ import com.j256.simpleclassreader.attribute.AttributeType;
 public class FieldInfoTest {
 	@Test
 	public void testStuff() throws IOException {
-		String path = classToPath(TestClass.class);
+		String path = TestUtils.classToPath(TestClass.class);
 		try (InputStream fis = new FileInputStream(path);) {
 			ClassInfo info = ClassReader.readClass(fis);
 			assertNotNull(info);
@@ -65,10 +65,6 @@ public class FieldInfoTest {
 			}
 			System.err.println("parse errors: " + info.getParseErrors());
 		}
-	}
-
-	private String classToPath(Class<?> clazz) {
-		return "target/test-classes/" + clazz.getName().replace('.', '/') + ".class";
 	}
 
 	@SuppressWarnings("unused")

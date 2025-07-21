@@ -21,7 +21,7 @@ public class MethodInfoTest {
 
 	@Test
 	public void testStuff() throws IOException {
-		String path = classToPath(TestClass.class);
+		String path = TestUtils.classToPath(TestClass.class);
 		try (InputStream fis = new FileInputStream(path);) {
 			ClassInfo info = ClassReader.readClass(fis);
 			assertNotNull(info);
@@ -87,7 +87,7 @@ public class MethodInfoTest {
 
 	@Test
 	public void testNoCode() throws IOException {
-		String path = classToPath(NoCodeClass.class);
+		String path = TestUtils.classToPath(NoCodeClass.class);
 		try (InputStream fis = new FileInputStream(path);) {
 			ClassInfo info = ClassReader.readClass(fis);
 			assertNotNull(info);
@@ -102,10 +102,6 @@ public class MethodInfoTest {
 			}
 			System.err.println("parse errors: " + info.getParseErrors());
 		}
-	}
-
-	private String classToPath(Class<?> clazz) {
-		return "target/test-classes/" + clazz.getName().replace('.', '/') + ".class";
 	}
 
 	@SuppressWarnings("unused")

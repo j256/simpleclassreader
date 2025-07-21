@@ -25,6 +25,7 @@ public enum ClassReaderErrorType {
 	ANNOTATION_ENUM_NAME_INDEX_INVALID("annotation enum value name index does not point to valid location"),
 	ANNOTATION_ENUM_CONST_INDEX_INVALID("annotation enum value const index does not point to valid location"),
 	ANNOTATION_VALUE_TAG_INVALID("annotation value has unknown tag"),
+	CODE_CATCH_TYPE_INDEX_INVALID("code catch-type index does not point to valid location"),
 	// end
 	;
 

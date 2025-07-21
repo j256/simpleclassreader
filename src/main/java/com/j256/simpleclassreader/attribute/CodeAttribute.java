@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.j256.simpleclassreader.AttributeInfo;
 import com.j256.simpleclassreader.ClassReaderError;
+import com.j256.simpleclassreader.ClassReaderErrorType;
 import com.j256.simpleclassreader.ConstantPool;
 import com.j256.simpleclassreader.Utils;
 
@@ -20,10 +21,10 @@ public class CodeAttribute {
 	private final int maxStack;
 	private final int maxLocals;
 	private final byte[] code;
-	private final ExceptionTable[] exceptions;
+	private final ExceptionHandler[] exceptions;
 	private final AttributeInfo[] attributes;
 
-	private CodeAttribute(int maxStack, int maxLocals, byte[] code, ExceptionTable[] exceptions,
+	private CodeAttribute(int maxStack, int maxLocals, byte[] code, ExceptionHandler[] exceptions,
 			AttributeInfo[] attributes) {
 		this.maxStack = maxStack;
 		this.maxLocals = maxLocals;
@@ -56,9 +57,9 @@ public class CodeAttribute {
 		int codeLength = dis.readInt();
 		byte[] code = Utils.readBytes(dis, codeLength);
 		int exceptionTableLength = dis.readUnsignedShort();
-		ExceptionTable[] exceptions = new ExceptionTable[exceptionTableLength];
+		ExceptionHandler[] exceptions = new ExceptionHandler[exceptionTableLength];
 		for (int i = 0; i < exceptions.length; i++) {
-			exceptions[i] = ExceptionTable.read(dis, constantPool, parseErrors);
+			exceptions[i] = ExceptionHandler.read(dis, constantPool, parseErrors);
 		}
 		int attributeCount = dis.readUnsignedShort();
 		List<AttributeInfo> attributeInfos = new ArrayList<>();
@@ -93,7 +94,10 @@ public class CodeAttribute {
 		return code;
 	}
 
-	public ExceptionTable[] getExceptions() {
+	/**
+	 * The exceptions that are handled by the code.
+	 */
+	public ExceptionHandler[] getExceptionHandlers() {
 		return exceptions;
 	}
 
@@ -101,20 +105,23 @@ public class CodeAttribute {
 		return attributes;
 	}
 
-	public static class ExceptionTable {
+	/**
+	 * Exception that is handled by a portion of the code.
+	 */
+	public static class ExceptionHandler {
 		private final int startPc;
 		private final int endPc;
 		private final int handlerPc;
-		private final int catchType;
+		private final String catchType;
 
-		private ExceptionTable(int startPc, int endPc, int handlerPc, int catchType) {
+		private ExceptionHandler(int startPc, int endPc, int handlerPc, String catchType) {
 			this.startPc = startPc;
 			this.endPc = endPc;
 			this.handlerPc = handlerPc;
 			this.catchType = catchType;
 		}
 
-		public static ExceptionTable read(DataInputStream dis, ConstantPool constantPool,
+		public static ExceptionHandler read(DataInputStream dis, ConstantPool constantPool,
 				List<ClassReaderError> parseErrors) throws IOException {
 
 			// u2 start_pc;
@@ -125,9 +132,15 @@ public class CodeAttribute {
 			int startPc = dis.readUnsignedShort();
 			int endPc = dis.readUnsignedShort();
 			int handlerPc = dis.readUnsignedShort();
-			int catchType = dis.readUnsignedShort();
+			int index = dis.readUnsignedShort();
+			String catchType = constantPool.findClassName(index);
+			if (catchType == null) {
+				parseErrors.add(new ClassReaderError(ClassReaderErrorType.CODE_CATCH_TYPE_INDEX_INVALID, index));
+			} else {
+				catchType = Utils.classPathToPackage(catchType);
+			}
 
-			return new ExceptionTable(startPc, endPc, handlerPc, catchType);
+			return new ExceptionHandler(startPc, endPc, handlerPc, catchType);
 		}
 
 		public int getStartPc() {
@@ -142,7 +155,10 @@ public class CodeAttribute {
 			return handlerPc;
 		}
 
-		public int getCatchType() {
+		/**
+		 * The type of exception that is caught by the code portion.
+		 */
+		public String getCatchType() {
 			return catchType;
 		}
 	}
