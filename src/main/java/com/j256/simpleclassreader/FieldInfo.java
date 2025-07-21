@@ -79,14 +79,20 @@ public class FieldInfo {
 				// try to read other known attributes
 				continue;
 			}
-			if (attributeInfo.getType() == AttributeType.CONSTANT_VALUE) {
-				constantValue = attributeInfo.getValue();
-			}
-			if (attributeInfo.getType() == AttributeType.RUNTIME_VISIBLE_ANNOTATIONS) {
-				runtimeAnnotations = ((RuntimeVisibleAnnotationsAttribute) attributeInfo.getValue()).getAnnotations();
-			}
-			if (attributeInfo.getType() == AttributeType.DEPRECATED) {
-				deprecated = true;
+			switch (attributeInfo.getType()) {
+				case CONSTANT_VALUE:
+					constantValue = attributeInfo.getValue();
+					break;
+				case RUNTIME_VISIBLE_ANNOTATIONS:
+					runtimeAnnotations =
+							((RuntimeVisibleAnnotationsAttribute) attributeInfo.getValue()).getAnnotations();
+					break;
+				case DEPRECATED:
+					deprecated = true;
+					break;
+				default:
+					// no additional processing
+					break;
 			}
 			if (attributeInfos == null) {
 				attributeInfos = new ArrayList<>();

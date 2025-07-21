@@ -75,6 +75,9 @@ public enum JdkVersion {
 		return jdk;
 	}
 
+	/**
+	 * Return a JDK version string with the optional minor-version.
+	 */
 	public String makeJdkString(int minorVersion) {
 		if (jdk.indexOf('.') >= 0) {
 			return jdk;

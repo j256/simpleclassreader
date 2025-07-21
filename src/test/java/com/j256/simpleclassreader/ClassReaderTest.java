@@ -148,7 +148,6 @@ public class ClassReaderTest {
 		}
 	}
 
-
 	private String classToPath(Class<?> clazz) {
 		return "target/test-classes/" + clazz.getName().replace('.', '/') + ".class";
 	}

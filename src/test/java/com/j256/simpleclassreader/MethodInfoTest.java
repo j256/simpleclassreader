@@ -4,6 +4,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.FileInputStream;
@@ -72,11 +73,31 @@ public class MethodInfoTest {
 					assertFalse(methodInfo.isStrict());
 					assertFalse(methodInfo.isSynthetic());
 					assertFalse(methodInfo.isConstructor());
+					assertNotNull(methodInfo.getCode());
 					assertEquals("(Ljava/lang/String;F)F", methodInfo.getMethodDescriptor().toString());
 					assertArrayEquals(new String[] { "java.io.IOException" }, methodInfo.getExceptions());
 					assertEquals("method " + methodInfo.getName(), methodInfo.toString());
 				} else {
 					assertFalse(methodInfo.isDeprecated());
+				}
+			}
+			System.err.println("parse errors: " + info.getParseErrors());
+		}
+	}
+
+	@Test
+	public void testNoCode() throws IOException {
+		String path = classToPath(NoCodeClass.class);
+		try (InputStream fis = new FileInputStream(path);) {
+			ClassInfo info = ClassReader.readClass(fis);
+			assertNotNull(info);
+			assertEquals(NoCodeClass.class.getName(), info.getClassName());
+			MethodInfo[] methods = info.getMethods();
+			// NOTE: there might be artificial methods when running with coverage data
+			for (MethodInfo methodInfo : methods) {
+				if ("getSize".equals(methodInfo.getName())) {
+					// abstract methods don't have code
+					assertNull(methodInfo.getCode());
 				}
 			}
 			System.err.println("parse errors: " + info.getParseErrors());
@@ -112,5 +133,9 @@ public class MethodInfoTest {
 		public static class Inner {
 			// empty
 		}
+	}
+
+	private static abstract class NoCodeClass {
+		public abstract int getSize();
 	}
 }

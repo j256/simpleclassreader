@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.j256.simpleclassreader.attribute.AnnotationInfo;
-import com.j256.simpleclassreader.attribute.AttributeType;
 import com.j256.simpleclassreader.attribute.InnerClassesAttribute;
 import com.j256.simpleclassreader.attribute.InnerClassesAttribute.InnerClassInfo;
 import com.j256.simpleclassreader.attribute.RuntimeVisibleAnnotationsAttribute;
@@ -109,14 +108,20 @@ public class ClassInfo {
 		InnerClassInfo[] innerClasses = null;
 		boolean deprecated = false;
 		for (AttributeInfo attributeInfo : attributes) {
-			if (attributeInfo.getType() == AttributeType.RUNTIME_VISIBLE_ANNOTATIONS) {
-				runtimeAnnotations = ((RuntimeVisibleAnnotationsAttribute) attributeInfo.getValue()).getAnnotations();
-			}
-			if (attributeInfo.getType() == AttributeType.INNER_CLASSES) {
-				innerClasses = ((InnerClassesAttribute) attributeInfo.getValue()).getInnerClasses();
-			}
-			if (attributeInfo.getType() == AttributeType.DEPRECATED) {
-				deprecated = true;
+			switch (attributeInfo.getType()) {
+				case DEPRECATED:
+					deprecated = true;
+					break;
+				case INNER_CLASSES:
+					innerClasses = ((InnerClassesAttribute) attributeInfo.getValue()).getInnerClasses();
+					break;
+				case RUNTIME_VISIBLE_ANNOTATIONS:
+					runtimeAnnotations =
+							((RuntimeVisibleAnnotationsAttribute) attributeInfo.getValue()).getAnnotations();
+					break;
+				default:
+					// no additional processing
+					break;
 			}
 		}
 

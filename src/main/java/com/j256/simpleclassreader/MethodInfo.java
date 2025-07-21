@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.j256.simpleclassreader.attribute.AnnotationInfo;
-import com.j256.simpleclassreader.attribute.AttributeType;
+import com.j256.simpleclassreader.attribute.CodeAttribute;
 import com.j256.simpleclassreader.attribute.ExceptionsAttribute;
 import com.j256.simpleclassreader.attribute.RuntimeVisibleAnnotationsAttribute;
 
@@ -27,10 +27,11 @@ public class MethodInfo {
 	private final String[] exceptions;
 	private final AnnotationInfo[] runtimeAnnotations;
 	private final boolean deprecated;
+	private final byte[] code;
 	private final boolean constructor;
 
 	public MethodInfo(String name, int accessFlags, MethodDescriptor methodDescriptor, AttributeInfo[] attributes,
-			String[] exceptions, AnnotationInfo[] runtimeAnnotations, boolean deprecated) {
+			String[] exceptions, AnnotationInfo[] runtimeAnnotations, boolean deprecated, byte[] code) {
 		this.name = name;
 		this.accessFlags = accessFlags;
 		this.methodDescriptor = methodDescriptor;
@@ -38,6 +39,7 @@ public class MethodInfo {
 		this.exceptions = exceptions;
 		this.runtimeAnnotations = runtimeAnnotations;
 		this.deprecated = deprecated;
+		this.code = code;
 		// we see if the method name is the constructor constant
 		this.constructor = CONSTRUCTOR_METHOD_NAME.equals(name);
 	}
@@ -76,19 +78,28 @@ public class MethodInfo {
 		String[] exceptions = null;
 		AnnotationInfo[] runtimeAnnotations = null;
 		boolean deprecated = false;
+		byte[] code = null;
 		for (int i = 0; i < attributeCount; i++) {
 			AttributeInfo attributeInfo = AttributeInfo.read(dis, constantPool, errors);
 			if (attributeInfo == null) {
 				continue;
 			}
-			if (attributeInfo.getType() == AttributeType.EXCEPTIONS) {
-				exceptions = ((ExceptionsAttribute) attributeInfo.getValue()).getExceptions();
-			}
-			if (attributeInfo.getType() == AttributeType.RUNTIME_VISIBLE_ANNOTATIONS) {
-				runtimeAnnotations = ((RuntimeVisibleAnnotationsAttribute) attributeInfo.getValue()).getAnnotations();
-			}
-			if (attributeInfo.getType() == AttributeType.DEPRECATED) {
-				deprecated = true;
+			switch (attributeInfo.getType()) {
+				case CODE:
+					code = ((CodeAttribute) attributeInfo.getValue()).getCode();
+					break;
+				case EXCEPTIONS:
+					exceptions = ((ExceptionsAttribute) attributeInfo.getValue()).getExceptions();
+					break;
+				case RUNTIME_VISIBLE_ANNOTATIONS:
+					runtimeAnnotations =
+							((RuntimeVisibleAnnotationsAttribute) attributeInfo.getValue()).getAnnotations();
+					break;
+				case DEPRECATED:
+					deprecated = true;
+				default:
+					// no additional processing
+					break;
 			}
 			if (attributeInfos == null) {
 				attributeInfos = new ArrayList<>();
@@ -101,7 +112,7 @@ public class MethodInfo {
 			attributes = attributeInfos.toArray(new AttributeInfo[attributeInfos.size()]);
 		}
 		return new MethodInfo(name, accessFlags, methodDescriptor, attributes, exceptions, runtimeAnnotations,
-				deprecated);
+				deprecated, code);
 	}
 
 	/**
@@ -271,6 +282,13 @@ public class MethodInfo {
 	 */
 	public boolean isDeprecated() {
 		return deprecated;
+	}
+
+	/**
+	 * Return the code bytes that were extracted from the attributes or null if none.
+	 */
+	public byte[] getCode() {
+		return code;
 	}
 
 	@Override
