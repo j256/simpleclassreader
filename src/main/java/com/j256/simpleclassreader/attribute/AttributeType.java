@@ -59,7 +59,7 @@ public enum AttributeType {
 			return result;
 		}
 	},
-	LINE_UMBER_TABLE("LineNumberTable") {
+	LINE_NUMBER_TABLE("LineNumberTable") {
 		@Override
 		public <T> T read(DataInputStream dis, int length, ConstantPool constantPool,
 				List<ClassReaderError> parseErrors) throws IOException {

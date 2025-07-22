@@ -10,9 +10,11 @@ import com.j256.simpleclassreader.ClassReaderError;
 import com.j256.simpleclassreader.ClassReaderErrorType;
 import com.j256.simpleclassreader.ConstantPool;
 import com.j256.simpleclassreader.Utils;
+import com.j256.simpleclassreader.attribute.LineNumberTableAttribute.LineNumberLocation;
+import com.j256.simpleclassreader.attribute.LocalVariableTableAttribute.LocalVariable;
 
 /**
- * Code attribute that stores the compiled code.
+ * Code attribute that stores the compiled code and various metadata.
  * 
  * @author graywatson
  */
@@ -22,14 +24,18 @@ public class CodeAttribute {
 	private final int maxLocals;
 	private final byte[] code;
 	private final ExceptionHandler[] exceptions;
+	private final LineNumberLocation[] lineNumberLocations;
+	private final LocalVariable[] localVariables;
 	private final AttributeInfo[] attributes;
 
 	private CodeAttribute(int maxStack, int maxLocals, byte[] code, ExceptionHandler[] exceptions,
-			AttributeInfo[] attributes) {
+			LineNumberLocation[] lineNumberLocations, LocalVariable[] localVariables, AttributeInfo[] attributes) {
 		this.maxStack = maxStack;
 		this.maxLocals = maxLocals;
 		this.code = code;
 		this.exceptions = exceptions;
+		this.lineNumberLocations = lineNumberLocations;
+		this.localVariables = localVariables;
 		this.attributes = attributes;
 	}
 
@@ -63,11 +69,25 @@ public class CodeAttribute {
 		}
 		int attributeCount = dis.readUnsignedShort();
 		List<AttributeInfo> attributeInfos = new ArrayList<>();
+		LineNumberLocation[] lineNumberLocations = null;
+		LocalVariable[] localVariables = null;
 		for (int i = 0; i < attributeCount; i++) {
 			AttributeInfo attributeInfo = AttributeInfo.read(dis, constantPool, parseErrors);
 			if (attributeInfo == null) {
 				// try to read other known attributes
 				continue;
+			}
+			switch (attributeInfo.getType()) {
+				case LINE_NUMBER_TABLE:
+					lineNumberLocations =
+							((LineNumberTableAttribute) attributeInfo.getValue()).getLineNumberLocations();
+					break;
+				case LOCAL_VARIABLE_TABLE:
+					localVariables = ((LocalVariableTableAttribute) attributeInfo.getValue()).getLocalVariables();
+					break;
+				default:
+					// no additional processing
+					break;
 			}
 			if (attributeInfos == null) {
 				attributeInfos = new ArrayList<>();
@@ -79,7 +99,8 @@ public class CodeAttribute {
 		if (attributeInfos != null) {
 			attributes = attributeInfos.toArray(new AttributeInfo[attributeInfos.size()]);
 		}
-		return new CodeAttribute(maxStack, maxLocals, code, exceptions, attributes);
+		return new CodeAttribute(maxStack, maxLocals, code, exceptions, lineNumberLocations, localVariables,
+				attributes);
 	}
 
 	public int getMaxStack() {
@@ -99,6 +120,14 @@ public class CodeAttribute {
 	 */
 	public ExceptionHandler[] getExceptionHandlers() {
 		return exceptions;
+	}
+
+	public LineNumberLocation[] getLineNumberLocations() {
+		return lineNumberLocations;
+	}
+
+	public LocalVariable[] getLocalVariables() {
+		return localVariables;
 	}
 
 	public AttributeInfo[] getAttributes() {

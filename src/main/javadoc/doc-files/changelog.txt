@@ -1,4 +1,4 @@
-0.4: 07/??/2025
+0.4: 07/22/2025
 	* Exposed the code attribute in the MethodInfo data.
 	* Added functionality to the method code attribute and added some testing for it.
 

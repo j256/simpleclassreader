@@ -9,7 +9,7 @@ import com.j256.simpleclassreader.ClassReaderError;
 import com.j256.simpleclassreader.ConstantPool;
 
 /**
- * Table of line numbers for debugging purposes.
+ * Table of line numbers associated with the [@link {@link CodeAttribute}}.
  * 
  * @author graywatson
  */

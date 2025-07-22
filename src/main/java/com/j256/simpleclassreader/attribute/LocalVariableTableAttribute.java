@@ -10,7 +10,7 @@ import com.j256.simpleclassreader.ConstantPool;
 import com.j256.simpleclassreader.DataDescriptor;
 
 /**
- * Table of line numbers for debugging purposes.
+ * Table of local variables associated with the [@link {@link CodeAttribute}}.
  * 
  * @author graywatson
  */
