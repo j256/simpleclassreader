@@ -160,27 +160,31 @@ public class DataDescriptor {
 
 		private static final ComponentType types[];
 
-		private final char ch;
+		private final char typeChar;
 		private final boolean primitive;
 		private final Class<?> dataClass;
 
 		static {
 			int max = 0;
 			for (ComponentType type : values()) {
-				if (type.ch > max) {
-					max = type.ch;
+				if (type.typeChar > max) {
+					max = type.typeChar;
 				}
 			}
 			types = new ComponentType[max + 1];
 			for (ComponentType type : values()) {
-				types[type.ch] = type;
+				types[type.typeChar] = type;
 			}
 		}
 
 		private ComponentType(char ch, boolean primitive, Class<?> dataClass) {
-			this.ch = ch;
+			this.typeChar = ch;
 			this.primitive = primitive;
 			this.dataClass = dataClass;
+		}
+
+		public char getTypeChar() {
+			return typeChar;
 		}
 
 		public boolean isPrimitive() {
