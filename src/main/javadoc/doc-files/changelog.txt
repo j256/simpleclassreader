@@ -1,5 +1,6 @@
 0.4: 07/22/2025
 	* Exposed the code attribute in the MethodInfo data.
+	* Exposed the line number and local variable information in the code attribute.
 	* Added functionality to the method code attribute and added some testing for it.
 
 0.3: 07/11/2025
