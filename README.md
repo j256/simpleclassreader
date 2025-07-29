@@ -1,7 +1,8 @@
 Simple Java Class Reader
 ========================
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.j256.simpleclassreader/simpleclassreader/badge.svg?style=flat-square)](https://mvnrepository.com/artifact/com.j256.simpleclassreader/simpleclassreader/latest)
+
+[![Maven Central](https://maven-badges.sml.io/maven-central/com.j256.simpleclassreader/simpleclassreader/badge.svg?style=flat-square)](https://mvnrepository.com/artifact/com.j256.simpleclassreader/simpleclassreader/latest)
 [![javadoc](https://javadoc.io/badge2/com.j256.simpleclassreader/simpleclassreader/javadoc.svg)](https://javadoc.io/doc/com.j256.simpleclassreader/simpleclassreader)
 [![ChangeLog](https://img.shields.io/github/v/release/j256/simpleclassreader?label=changelog&display_name=release)](https://github.com/j256/simpleclassreader/blob/master/src/main/javadoc/doc-files/changelog.txt)
 [![CodeCov](https://img.shields.io/codecov/c/github/j256/simpleclassreader.svg)](https://codecov.io/github/j256/simpleclassreader/)
