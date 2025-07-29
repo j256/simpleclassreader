@@ -27,7 +27,7 @@ public class AnnotationInfoTest {
 			AnnotationInfo[] annotations = info.getRuntimeAnnotations();
 			assertNotNull(annotations);
 			assertEquals(1, annotations.length);
-			AnnotationNameValue[] values = annotations[0].getValues();
+			AnnotationFieldValue[] values = annotations[0].getValues();
 			assertNotNull(values);
 			assertEquals(12, values.length);
 			assertEquals((byte) 123, (byte) values[0].getConstByteValue());
@@ -42,7 +42,7 @@ public class AnnotationInfoTest {
 			assertEquals(MyNum.class.getName(), values[9].getEnumValue().getType());
 			assertEquals(MyNum.BAR.name(), values[9].getEnumValue().getConstant());
 			assertEquals(String.class.getName(), values[10].getClassValue());
-			AnnotationNameValue[] arrayValues = values[11].getArrayValues();
+			AnnotationFieldValue[] arrayValues = values[11].getArrayValues();
 			assertNotNull(arrayValues);
 			// should match [ 1, 2, 3 ]
 			assertEquals(3, arrayValues.length);
@@ -67,9 +67,10 @@ public class AnnotationInfoTest {
 			AnnotationInfo[] annotations = info.getRuntimeAnnotations();
 			assertNotNull(annotations);
 			assertEquals(1, annotations.length);
-			AnnotationNameValue[] values = annotations[0].getValues();
+			AnnotationFieldValue[] values = annotations[0].getValues();
 			assertNotNull(values);
 			assertEquals(12, values.length);
+			assertEquals("byteValue", values[0].getFieldName());
 			try {
 				// should be byte
 				values[0].getConstCharacterValue();

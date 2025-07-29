@@ -10,7 +10,7 @@ import com.j256.simpleclassreader.ClassReaderError;
 import com.j256.simpleclassreader.ConstantPool;
 
 /**
- * Class which stores attribute info.
+ * Type of the annotation..
  * 
  * @author graywatson
  */

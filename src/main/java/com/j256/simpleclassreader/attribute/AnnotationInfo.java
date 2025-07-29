@@ -19,9 +19,9 @@ import com.j256.simpleclassreader.DataDescriptor;
 public class AnnotationInfo {
 
 	private final String type;
-	private final AnnotationNameValue[] values;
+	private final AnnotationFieldValue[] values;
 
-	private AnnotationInfo(String type, AnnotationNameValue[] values) {
+	private AnnotationInfo(String type, AnnotationFieldValue[] values) {
 		this.type = type;
 		this.values = values;
 	}
@@ -54,9 +54,9 @@ public class AnnotationInfo {
 		}
 		int numValuePairs = dis.readUnsignedShort();
 
-		List<AnnotationNameValue> values = new ArrayList<>();
+		List<AnnotationFieldValue> values = new ArrayList<>();
 		for (int i = 0; i < numValuePairs; i++) {
-			AnnotationNameValue value = AnnotationNameValue.read(dis, constantPool, parseErrors, true);
+			AnnotationFieldValue value = AnnotationFieldValue.read(dis, constantPool, parseErrors, true);
 			if (value == null) {
 				// error already added
 				return null;
@@ -64,14 +64,20 @@ public class AnnotationInfo {
 			values.add(value);
 		}
 
-		return new AnnotationInfo(typeStr, values.toArray(new AnnotationNameValue[values.size()]));
+		return new AnnotationInfo(typeStr, values.toArray(new AnnotationFieldValue[values.size()]));
 	}
 
+	/**
+	 * Return the type or class-name of the annotation.
+	 */
 	public String getType() {
 		return type;
 	}
 
-	public AnnotationNameValue[] getValues() {
+	/**
+	 * Get the field-value pairs of each of the annotation arguments.
+	 */
+	public AnnotationFieldValue[] getValues() {
 		return values;
 	}
 

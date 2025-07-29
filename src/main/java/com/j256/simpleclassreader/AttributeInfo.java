@@ -7,7 +7,7 @@ import java.util.List;
 import com.j256.simpleclassreader.attribute.AttributeType;
 
 /**
- * Information about a an attribute of a class, field, or method.
+ * Information about an attribute of a class, field, or method.
  * 
  * @author graywatson
  */
@@ -53,14 +53,23 @@ public class AttributeInfo {
 		return new AttributeInfo(name, type, value);
 	}
 
+	/**
+	 * Return the name of the annotation.
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * Get the type of the annotation.
+	 */
 	public AttributeType getType() {
 		return type;
 	}
 
+	/**
+	 * Return the value of the annotation whose type depends on the annotation type.
+	 */
 	public Object getValue() {
 		return value;
 	}

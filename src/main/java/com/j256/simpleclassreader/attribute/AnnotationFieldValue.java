@@ -15,21 +15,21 @@ import com.j256.simpleclassreader.DataDescriptor;
  * 
  * @author graywatson
  */
-public class AnnotationNameValue {
+public class AnnotationFieldValue {
 
-	private final String typeName;
-	private final AnnotationValueTag tag;
+	private final String fieldName;
+	private final AnnotationValueType type;
 	private final Object constValue;
 	private final EnumAnnotationValue enumValue;
 	private final String classValue;
 	private final AnnotationInfo subAnnotationValue;
-	private final AnnotationNameValue[] arrayValues;
+	private final AnnotationFieldValue[] arrayValues;
 
-	private AnnotationNameValue(String typeName, AnnotationValueTag tag, Object constValue,
+	private AnnotationFieldValue(String fieldName, AnnotationValueType type, Object constValue,
 			EnumAnnotationValue enumValue, String classValue, AnnotationInfo subAnnotationValue,
-			AnnotationNameValue[] arrayValues) {
-		this.typeName = typeName;
-		this.tag = tag;
+			AnnotationFieldValue[] arrayValues) {
+		this.fieldName = fieldName;
+		this.type = type;
 		this.constValue = constValue;
 		this.enumValue = enumValue;
 		this.classValue = classValue;
@@ -40,26 +40,28 @@ public class AnnotationNameValue {
 	/**
 	 * Read in an element-value-pair into a AnnotationValue class.
 	 */
-	public static AnnotationNameValue read(DataInputStream dis, ConstantPool constantPool,
+	public static AnnotationFieldValue read(DataInputStream dis, ConstantPool constantPool,
 			List<ClassReaderError> parseErrors, boolean readName) throws IOException {
+
 		// { u2 element_name_index;
 		// element_value value;
 		// } element_value_pairs[num_element_value_pairs];
 
-		String typeName = null;
+		String fieldName = null;
 		if (readName) {
-			int nameIndex = dis.readUnsignedShort();
-			typeName = constantPool.findName(nameIndex);
-			if (typeName == null) {
-				parseErrors.add(new ClassReaderError(ClassReaderErrorType.ANNOTATION_NAME_INDEX_INVALID, nameIndex));
+			int index = dis.readUnsignedShort();
+			fieldName = constantPool.findName(index);
+			if (fieldName == null) {
+				parseErrors.add(new ClassReaderError(ClassReaderErrorType.ANNOTATION_FIELD_NAME_INDEX_INVALID, index));
 			}
 		}
 
+		// reading element_value
 		// u1 tag
-		int tagChar = dis.read();
-		AnnotationValueTag tag = AnnotationValueTag.fromChar(tagChar);
-		if (tag == null) {
-			parseErrors.add(new ClassReaderError(ClassReaderErrorType.ANNOTATION_VALUE_TAG_INVALID, tagChar));
+		int typeChar = dis.read();
+		AnnotationValueType type = AnnotationValueType.fromChar(typeChar);
+		if (type == null) {
+			parseErrors.add(new ClassReaderError(ClassReaderErrorType.ANNOTATION_VALUE_TAG_INVALID, typeChar));
 			return null;
 		}
 
@@ -67,9 +69,9 @@ public class AnnotationNameValue {
 		EnumAnnotationValue enumValue = null;
 		String classValue = null;
 		AnnotationInfo subAnnotationValue = null;
-		AnnotationNameValue[] arrayValues = null;
+		AnnotationFieldValue[] arrayValues = null;
 
-		switch (tag) {
+		switch (type) {
 			case BYTE:
 				// u2 const_value_index;
 				// read as an integer
@@ -167,9 +169,9 @@ public class AnnotationNameValue {
 				// u2 num_values;
 				// element_value values[num_values];
 				int numValues = dis.readUnsignedShort();
-				List<AnnotationNameValue> arrayValueList = new ArrayList<>();
+				List<AnnotationFieldValue> arrayValueList = new ArrayList<>();
 				for (int i = 0; i < numValues; i++) {
-					AnnotationNameValue element = AnnotationNameValue.read(dis, constantPool, parseErrors, false);
+					AnnotationFieldValue element = AnnotationFieldValue.read(dis, constantPool, parseErrors, false);
 					if (element == null) {
 						// error already added
 						return null;
@@ -178,171 +180,177 @@ public class AnnotationNameValue {
 					}
 				}
 				arrayValues =
-						arrayValueList.toArray(arrayValueList.toArray(new AnnotationNameValue[arrayValueList.size()]));
+						arrayValueList.toArray(arrayValueList.toArray(new AnnotationFieldValue[arrayValueList.size()]));
 				break;
 			default:
-				parseErrors.add(new ClassReaderError(ClassReaderErrorType.ANNOTATION_VALUE_TAG_INVALID, tag));
+				parseErrors.add(new ClassReaderError(ClassReaderErrorType.ANNOTATION_VALUE_TAG_INVALID, type));
 				return null;
 		}
 
-		return new AnnotationNameValue(typeName, tag, constValue, enumValue, classValue, subAnnotationValue,
+		return new AnnotationFieldValue(fieldName, type, constValue, enumValue, classValue, subAnnotationValue,
 				arrayValues);
 	}
 
-	public String getTypeName() {
-		return typeName;
-	}
-
-	public AnnotationValueTag getTag() {
-		return tag;
+	/**
+	 * Return the name of the annotation field. Called "type-name" in the specification.
+	 */
+	public String getFieldName() {
+		return fieldName;
 	}
 
 	/**
-	 * Return the constant value if the tag is {@link AnnotationValueTag#BYTE}, {@link AnnotationValueTag#CHARACTER},
-	 * {@link AnnotationValueTag#SHORT}, {@link AnnotationValueTag#INTEGER}, {@link AnnotationValueTag#LONG},
-	 * {@link AnnotationValueTag#FLOAT}, {@link AnnotationValueTag#DOUBLE}, {@link AnnotationValueTag#BOOLEAN}, and
-	 * {@link AnnotationValueTag#STRING}.
+	 * Return the type of the annotation field called "tag" in the specification.
+	 */
+	public AnnotationValueType getType() {
+		return type;
+	}
+
+	/**
+	 * Return the constant value if the tag is {@link AnnotationValueType#BYTE}, {@link AnnotationValueType#CHARACTER},
+	 * {@link AnnotationValueType#SHORT}, {@link AnnotationValueType#INTEGER}, {@link AnnotationValueType#LONG},
+	 * {@link AnnotationValueType#FLOAT}, {@link AnnotationValueType#DOUBLE}, {@link AnnotationValueType#BOOLEAN}, and
+	 * {@link AnnotationValueType#STRING}.
 	 */
 	public Object getConstValue() {
 		return constValue;
 	}
 
 	/**
-	 * Return the constant value if the tag is {@link AnnotationValueTag#BYTE}.
+	 * Return the constant value if the tag is {@link AnnotationValueType#BYTE}.
 	 */
 	public Byte getConstByteValue() {
-		if (tag == AnnotationValueTag.BYTE) {
+		if (type == AnnotationValueType.BYTE) {
 			return (Byte) constValue;
 		} else {
-			throw new IllegalArgumentException("annotation name/value has " + tag + " tag, not byte");
+			throw new IllegalArgumentException("annotation name/value has " + type + " tag, not byte");
 		}
 	}
 
 	/**
-	 * Return the constant value if the tag is {@link AnnotationValueTag#CHARACTER}.
+	 * Return the constant value if the tag is {@link AnnotationValueType#CHARACTER}.
 	 */
 	public Character getConstCharacterValue() {
-		if (tag == AnnotationValueTag.CHARACTER) {
+		if (type == AnnotationValueType.CHARACTER) {
 			return (Character) constValue;
 		} else {
-			throw new IllegalArgumentException("annotation name/value has " + tag + " tag, not characterr");
+			throw new IllegalArgumentException("annotation name/value has " + type + " tag, not characterr");
 		}
 	}
 
 	/**
-	 * Return the constant value if the tag is {@link AnnotationValueTag#SHORT}.
+	 * Return the constant value if the tag is {@link AnnotationValueType#SHORT}.
 	 */
 	public Short getConstShortValue() {
-		if (tag == AnnotationValueTag.SHORT) {
+		if (type == AnnotationValueType.SHORT) {
 			return (Short) constValue;
 		} else {
-			throw new IllegalArgumentException("annotation name/value has " + tag + " tag, not short");
+			throw new IllegalArgumentException("annotation name/value has " + type + " tag, not short");
 		}
 	}
 
 	/**
-	 * Return the constant value if the tag is {@link AnnotationValueTag#INTEGER}.
+	 * Return the constant value if the tag is {@link AnnotationValueType#INTEGER}.
 	 */
 	public Integer getConstIntegerValue() {
-		if (tag == AnnotationValueTag.INTEGER) {
+		if (type == AnnotationValueType.INTEGER) {
 			return (Integer) constValue;
 		} else {
-			throw new IllegalArgumentException("annotation name/value has " + tag + " tag, not integer");
+			throw new IllegalArgumentException("annotation name/value has " + type + " tag, not integer");
 		}
 	}
 
 	/**
-	 * Return the constant value if the tag is {@link AnnotationValueTag#LONG}.
+	 * Return the constant value if the tag is {@link AnnotationValueType#LONG}.
 	 */
 	public Long getConstLongValue() {
-		if (tag == AnnotationValueTag.LONG) {
+		if (type == AnnotationValueType.LONG) {
 			return (Long) constValue;
 		} else {
-			throw new IllegalArgumentException("annotation name/value has " + tag + " tag, not long");
+			throw new IllegalArgumentException("annotation name/value has " + type + " tag, not long");
 		}
 	}
 
 	/**
-	 * Return the constant value if the tag is {@link AnnotationValueTag#FLOAT}.
+	 * Return the constant value if the tag is {@link AnnotationValueType#FLOAT}.
 	 */
 	public Float getConstFloatValue() {
-		if (tag == AnnotationValueTag.FLOAT) {
+		if (type == AnnotationValueType.FLOAT) {
 			return (Float) constValue;
 		} else {
-			throw new IllegalArgumentException("annotation name/value has " + tag + " tag, not float");
+			throw new IllegalArgumentException("annotation name/value has " + type + " tag, not float");
 		}
 	}
 
 	/**
-	 * Return the constant value if the tag is {@link AnnotationValueTag#DOUBLE}.
+	 * Return the constant value if the tag is {@link AnnotationValueType#DOUBLE}.
 	 */
 	public Double getConstDoubleValue() {
-		if (tag == AnnotationValueTag.DOUBLE) {
+		if (type == AnnotationValueType.DOUBLE) {
 			return (Double) constValue;
 		} else {
-			throw new IllegalArgumentException("annotation name/value has " + tag + " tag, not double");
+			throw new IllegalArgumentException("annotation name/value has " + type + " tag, not double");
 		}
 	}
 
 	/**
-	 * Return the constant value if the tag is {@link AnnotationValueTag#BOOLEAN}.
+	 * Return the constant value if the tag is {@link AnnotationValueType#BOOLEAN}.
 	 */
 	public Boolean getConstBooleanValue() {
-		if (tag == AnnotationValueTag.BOOLEAN) {
+		if (type == AnnotationValueType.BOOLEAN) {
 			return (Boolean) constValue;
 		} else {
-			throw new IllegalArgumentException("annotation name/value has " + tag + " tag, not boolean");
+			throw new IllegalArgumentException("annotation name/value has " + type + " tag, not boolean");
 		}
 	}
 
 	/**
-	 * Return the constant value if the tag is {@link AnnotationValueTag#STRING}.
+	 * Return the constant value if the tag is {@link AnnotationValueType#STRING}.
 	 */
 	public String getConstStringValue() {
-		if (tag == AnnotationValueTag.STRING) {
+		if (type == AnnotationValueType.STRING) {
 			return (String) constValue;
 		} else {
-			throw new IllegalArgumentException("annotation name/value has " + tag + " tag, not string");
+			throw new IllegalArgumentException("annotation name/value has " + type + " tag, not string");
 		}
 	}
 
 	/**
-	 * Return the enum value if the tag is {@link AnnotationValueTag#ENUM}.
+	 * Return the enum value if the tag is {@link AnnotationValueType#ENUM}.
 	 */
 	public EnumAnnotationValue getEnumValue() {
 		return enumValue;
 	}
 
 	/**
-	 * Return the class value if the tag is {@link AnnotationValueTag#CLASS}.
+	 * Return the class value if the tag is {@link AnnotationValueType#CLASS}.
 	 */
 	public String getClassValue() {
 		return classValue;
 	}
 
 	/**
-	 * Return the sub-annotation value if the tag is {@link AnnotationValueTag#SUB_ANNOTATION}.
+	 * Return the sub-annotation value if the tag is {@link AnnotationValueType#SUB_ANNOTATION}.
 	 */
 	public AnnotationInfo getSubAnnotationValue() {
 		return subAnnotationValue;
 	}
 
 	/**
-	 * // * Return the array of annotations value if the tag is {@link AnnotationValueTag#ARRAY}.
+	 * // * Return the array of annotations value if the tag is {@link AnnotationValueType#ARRAY}.
 	 */
-	public AnnotationNameValue[] getArrayValues() {
+	public AnnotationFieldValue[] getArrayValues() {
 		return arrayValues;
 	}
 
 	@Override
 	public String toString() {
-		return tag + " value";
+		return type + " value";
 	}
 
 	/**
 	 * Value union of the annotation from the tag.
 	 */
-	public static enum AnnotationValueTag {
+	public static enum AnnotationValueType {
 		/** byte constant value type converted from int */
 		BYTE('B'),
 		/** char constant value type converted from int */
@@ -372,31 +380,31 @@ public class AnnotationNameValue {
 		// end
 		;
 
-		private final static AnnotationValueTag[] tags;
+		private final static AnnotationValueType[] tags;
 
 		private final char tagChar;
 
 		static {
 			int max = 0;
-			for (AnnotationValueTag tag : values()) {
+			for (AnnotationValueType tag : values()) {
 				if (tag.tagChar > max) {
 					max = tag.tagChar;
 				}
 			}
-			tags = new AnnotationValueTag[max + 1];
-			for (AnnotationValueTag tag : values()) {
+			tags = new AnnotationValueType[max + 1];
+			for (AnnotationValueType tag : values()) {
 				tags[tag.tagChar] = tag;
 			}
 		}
 
-		private AnnotationValueTag(char tagChar) {
+		private AnnotationValueType(char tagChar) {
 			this.tagChar = tagChar;
 		}
 
 		/**
 		 * Return the value tag associated with the ch argument or null if none.
 		 */
-		public static AnnotationValueTag fromChar(int ch) {
+		public static AnnotationValueType fromChar(int ch) {
 			if (ch < 0 || ch >= tags.length) {
 				return null;
 			} else {

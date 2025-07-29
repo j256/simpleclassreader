@@ -19,7 +19,7 @@ public enum ClassReaderErrorType {
 	ATTRIBUTE_NAME_INDEX_INVALID("attribute name index does not point to valid location"),
 	ATTRIBUTE_NAME_UNKNOWN("attribute name is not known to the lubrary"),
 	EXCEPTION_NAME_INDEX_INVALID("exception name index does not point to valid location"),
-	ANNOTATION_NAME_INDEX_INVALID("annotation name index does not point to valid location"),
+	ANNOTATION_FIELD_NAME_INDEX_INVALID("annotation name index does not point to valid location"),
 	ANNOTATION_TYPE_INDEX_INVALID("annotation data descriptor index does not point to a valid location"),
 	ANNOTATION_TYPE_INVALID("annotation data descriptor is not valid"),
 	ANNOTATION_ENUM_NAME_INDEX_INVALID("annotation enum value name index does not point to valid location"),

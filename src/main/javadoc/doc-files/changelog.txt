@@ -1,3 +1,7 @@
+1.0: 07/??/2025
+	* Renamed AnnotationNameValue to AnnotationFieldValue and the value-tag to value-type.
+	* Ready for 1.0+ version.
+
 0.4: 07/22/2025
 	* Exposed the code attribute in the MethodInfo data.
 	* Exposed the line number and local variable information in the code attribute.
