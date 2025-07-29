@@ -24,8 +24,8 @@ public class RuntimeVisibleAnnotationsAttribute {
 	public static RuntimeVisibleAnnotationsAttribute read(DataInputStream dis, ConstantPool constantPool,
 			List<ClassReaderError> parseErrors) throws IOException {
 
-		// u2 attribute_name_index; // already read
-		// u4 attribute_length; // already read
+		// u2 attribute_name_index; (already read)
+		// u4 attribute_length; (already read)
 		// u2 num_annotations;
 		// annotation annotations[num_annotations];
 		//

@@ -24,8 +24,8 @@ public class LineNumberTableAttribute {
 	public static LineNumberTableAttribute read(DataInputStream dis, ConstantPool constantPool,
 			List<ClassReaderError> parseErrors) throws IOException {
 
-		// u2 attribute_name_index;
-		// u4 attribute_length;
+		// u2 attribute_name_index; (already read)
+		// u4 attribute_length; (already read)
 		// u2 line_number_table_length;
 		// { } line_number_table[line_number_table_length];
 

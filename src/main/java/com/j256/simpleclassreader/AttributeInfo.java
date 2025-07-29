@@ -43,13 +43,10 @@ public class AttributeInfo {
 		}
 		int length = dis.readInt();
 		AttributeType type = AttributeType.fromString(name);
-		if (type == null) {
+		if (type == AttributeType.UNKNOWN) {
 			parseErrors.add(new ClassReaderError(ClassReaderErrorType.ATTRIBUTE_NAME_UNKNOWN, name));
-			// skip over the rest of the attribute
-			dis.skip(length);
-			return null;
 		}
-		Object value = type.read(dis, length, constantPool, parseErrors);
+		Object value = type.read(dis, name, length, constantPool, parseErrors);
 		return new AttributeInfo(name, type, value);
 	}
 

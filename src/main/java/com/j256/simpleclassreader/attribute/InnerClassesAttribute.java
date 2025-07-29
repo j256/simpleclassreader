@@ -27,8 +27,8 @@ public class InnerClassesAttribute {
 	public static InnerClassesAttribute read(DataInputStream dis, ConstantPool constantPool,
 			List<ClassReaderError> parseErrors) throws IOException {
 
-		// u2 attribute_name_index; already read
-		// u4 attribute_length; already read
+		// u2 attribute_name_index; (already read)
+		// u4 attribute_length; (already read)
 		// u2 number_of_classes;
 		// { } classes[number_of_classes];
 

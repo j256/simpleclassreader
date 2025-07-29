@@ -1,5 +1,6 @@
 1.0: 07/??/2025
 	* Renamed AnnotationNameValue to AnnotationFieldValue and the value-tag to value-type.
+	* Added UnknownAttribute to read in a not-known attribute as a bag of bytes.
 	* Ready for 1.0+ version.
 
 0.4: 07/22/2025
