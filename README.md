@@ -1,4 +1,4 @@
-sSimple Java Class Reader
+Simple Java Class Reader
 ========================
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.j256.simpleclassreader/simpleclassreader?style=flat-square)](https://mvnrepository.com/artifact/com.j256.simpleclassreader/simpleclassreader/latest)
