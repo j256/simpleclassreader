@@ -5,7 +5,7 @@ sSimple Java Class Reader
 [![javadoc](https://javadoc.io/badge2/com.j256.simpleclassreader/simpleclassreader/javadoc.svg)](https://javadoc.io/doc/com.j256.simpleclassreader/simpleclassreader)
 [![ChangeLog](https://img.shields.io/github/v/release/j256/simpleclassreader?label=changelog&display_name=release)](https://github.com/j256/simpleclassreader/blob/master/src/main/javadoc/doc-files/changelog.txt)
 [![CodeCov](https://img.shields.io/codecov/c/github/j256/simpleclassreader.svg)](https://codecov.io/github/j256/simpleclassreader/)
-[![CircleCI](https://circleci.com/gh/j256/simpleclassreader.svg?style=shield)](https://circleci.com/gh/j256/simpleclassreader)
+[![CI](https://github.com/j256/simpleclassreader/actions/workflows/main.yml/badge.svg)](https://github.com/j256/simpleclassreader/actions/workflows/main.yml)
 [![GitHub License](https://img.shields.io/github/license/j256/simpleclassreader)](https://github.com/j256/simpleclassreader/blob/master/LICENSE.txt)
 
 library that allows you to read class bytes and see all of the class metadata without loading the class which
