@@ -3,7 +3,7 @@
 # Release script
 #
 
-LIBRARY="simpleclassreader"
+LIBRARY=`basename $(pwd)`
 LOCAL_DIR="$HOME/svn/local/$LIBRARY"
 
 #############################################################
@@ -33,12 +33,16 @@ if [ $? -ne 0 ]; then
     bad=1
 fi
 
-#############################################################
-# check maven settings
-
-grep sonatype-nexus-snapshots $HOME/.m2/settings.xml > /dev/null 2>&1
+mvn -B -q javadoc:javadoc
 if [ $? -ne 0 ]; then
-    /bin/echo "ERROR: Can't find sonatype info in the maven settings.xml file"
+    /bin/echo "ERROR: javadoc errors exist"
+    bad=1
+fi
+
+cd $LOCAL_DIR
+mvn javadoc:javadoc | grep WARNING
+if [ $? -eq 0 ]; then
+    /bin/echo "ERROR: javadoc warnings exist"
     bad=1
 fi
 
@@ -46,15 +50,12 @@ fi
 
 release=$(grep version pom.xml | grep SNAPSHOT | head -1 | cut -f2 -d\> | cut -f1 -d\-)
 
-# don't prompt if there is bad stuff
-if [ $bad -eq 0 ]; then
-    /bin/echo ""
-    /bin/echo "------------------------------------------------------- "
-    /bin/echo -n "Enter release number [$release]: "
-    read rel
-    if [ "$rel" != "" ]; then
-	release=$rel
-    fi
+/bin/echo ""
+/bin/echo "------------------------------------------------------- "
+/bin/echo -n "Enter ${LIBRARY} release number [$release]: "
+read rel
+if [ "$rel" != "" ]; then
+    release=$rel
 fi
 
 #############################################################
@@ -124,10 +125,9 @@ git push --delete origin $tag 2> /dev/null
 read cont
 if [ "$cont" = "" -o "$cont" = "y" ]; then
     cd $LOCAL_DIR
-    mvn -P st release:clean || exit 1
-    mvn -P st release:prepare || ( /bin/echo "Maybe use mvn release:rollback to rollback"; exit 1 )
-    mvn -P st release:perform || ( /bin/echo "Maybe use mvn release:rollback to rollback"; exit 1 )
-
+    mvn release:clean || exit 1
+    mvn release:prepare || { /bin/echo "Maybe use mvn release:rollback to rollback"; exit 1; }
+    mvn release:perform || { /bin/echo "Maybe use mvn release:rollback to rollback"; exit 1; }
     /bin/echo ""
     /bin/echo ""
 fi
