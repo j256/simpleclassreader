@@ -7,6 +7,18 @@ LIBRARY=`basename $(pwd)`
 LOCAL_DIR="$HOME/svn/local/$LIBRARY"
 
 #############################################################
+
+release=$(grep version pom.xml | grep SNAPSHOT | head -1 | cut -f2 -d\> | cut -f1 -d\-)
+
+/bin/echo ""
+/bin/echo "------------------------------------------------------- "
+/bin/echo -n "Enter ${LIBRARY} release number [$release]: "
+read rel
+if [ "$rel" != "" ]; then
+    release=$rel
+fi
+
+#############################################################
 # check initial stuff
 
 bad=0
@@ -33,6 +45,7 @@ if [ $? -ne 0 ]; then
     bad=1
 fi
 
+echo "running javadoc tests"
 mvn -B -q javadoc:javadoc
 if [ $? -ne 0 ]; then
     /bin/echo "ERROR: javadoc errors exist"
@@ -44,18 +57,6 @@ mvn javadoc:javadoc | grep WARNING
 if [ $? -eq 0 ]; then
     /bin/echo "ERROR: javadoc warnings exist"
     bad=1
-fi
-
-#############################################################
-
-release=$(grep version pom.xml | grep SNAPSHOT | head -1 | cut -f2 -d\> | cut -f1 -d\-)
-
-/bin/echo ""
-/bin/echo "------------------------------------------------------- "
-/bin/echo -n "Enter ${LIBRARY} release number [$release]: "
-read rel
-if [ "$rel" != "" ]; then
-    release=$rel
 fi
 
 #############################################################
